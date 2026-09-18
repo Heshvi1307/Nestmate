@@ -429,26 +429,36 @@ VITE_API_BASE_URL=http://localhost:8000
 
 ---
 
-## 9. Implemented Pillars & Future Roadmap
+---
 
-RentFair AI has implemented both **Pillar 1 (FairLease Guard)** and **Pillar 2 (HarmonyMatch)** as fully functional, interactive production modules:
+## 9. Implemented Pillars & Full System Architecture
+
+RentFair AI now has all **4 core pillars** implemented as fully functional, interactive production modules:
 
 ```mermaid
 flowchart LR
-    P1["Pillar 1: FairLease Guard (Active & Complete)"] --> P2["Pillar 2: HarmonyMatch (Active & Complete)"]
-    P2 --> P3["Pillar 3: SnapFix Triage (Architecture Ready)"]
-    P3 --> P4["Pillar 4: TrueCost Index (Architecture Ready)"]
+    P1["Pillar 1: FairLease Guard\n(MTA Legal Audit & Counter-Clause)"] --> P2["Pillar 2: HarmonyMatch\n(6-Vector Lifestyle Cosine Engine)"]
+    P2 --> P3["Pillar 3: SnapFix Triage\n(Anti-Fraud Forensics & MTA Triage)"]
+    P3 --> P4["Pillar 4: TrueCost Index\n(Total Living Cost & Anti-Deception)"]
 ```
 
-1. **🛡️ Pillar 1: FairLease Guard (COMPLETED)**:
-   - Full Model Tenancy Act legal audit, 5 benchmarks, risk gauge, clawback timeline, and AI counter-clause drafting.
-2. **🤝 Pillar 2: HarmonyMatch (COMPLETED)**:
-   - Weighted cosine similarity lifestyle vector matching, 6 lifestyle dimensions, friction/synergy diagnostics, pre-loaded candidate profiles, and automated Roommate Living Charter generation.
-3. **🔧 Pillar 3: SnapFix Triage (Next on 24-Hour Roadmap)**:
-   - Visual defect triage: upload move-in photos with SHA-256 integrity hashes stored in local state to prove pre-existing wall seepage or plumbing defects.
-   - Generates fair contractor repair cost estimates in INR to prevent excessive move-out deposit deductions.
-4. **📊 Pillar 4: TrueCost Index (Next on 24-Hour Roadmap)**:
-   - All-inclusive living expense calculator combining base rent, society maintenance, water/electricity tariffs, and deposit opportunity costs into a single realistic monthly metric.
+1. **🛡️ Pillar 1: FairLease Guard (COMPLETED & HARDENED)**:
+   - Full Model Tenancy Act (2021) statutory audit engine with Gemini 2.5 Flash + deterministic fallback.
+   - 7 Indian tenancy benchmark agreements in archive, risk meter, clawback timeline, and 1-click counter-clause drafting.
+2. **🤝 Pillar 2: HarmonyMatch (COMPLETED & ACTIVE)**:
+   - 6-vector weighted cosine similarity lifestyle matching engine (`cleanliness`, `sleep_schedule`, `guest_policy`, `bill_discipline`, `noise_tolerance`, `dietary_kitchen`).
+   - Friction & synergy diagnostics, candidate profiles, and automated Roommate Living Charter generation.
+3. **🔧 Pillar 3: SnapFix Triage & Anti-Fraud Engine (COMPLETED & ACTIVE)**:
+   - Dynamic physical liveness challenge (`RF-XXXX`), hardware EXIF telemetry, SHA-256 cryptographic integrity hash, and GPS geofence validation (<250m).
+   - MTA Second Schedule statutory repair liability classification (landlord vs tenant duties) and contractor-backed fair INR repair estimates.
+   - Bilateral inspection certificate package with WhatsApp counter-sign handshake.
+4. **📊 Pillar 4: TrueCost Index™ (COMPLETED & ACTIVE)**:
+   - Unbundles advertised rent from hidden society maintenance, commercial DG backup rates (₹24/kWh), parking charges, and amortized upfront brokerage/fees.
+   - **Deposit Opportunity Cost Engine**: Quantifies wealth loss at 7.1% per annum liquid investment benchmark, flagging predatory >2x deposits.
+   - **Commute Burnout Multiplier**: Evaluates cash fuel/cab expenditure and calculates real monthly hours lost sitting in traffic.
+   - **Hyper-Local Micro-Corridor Benchmarks**: Pre-loaded indices for Ahmedabad (Vastrapur, SG Highway, Prahlad Nagar, Bopal, GIFT City), Bengaluru (Koramangala, HSR, Whitefield), and Mumbai (Andheri West, Powai) with deviation badges.
+   - **Flat A vs Flat B 11-Month TCO Faceoff**: Side-by-side financial and lifestyle comparison declaring the true winner.
+   - **1-Click WhatsApp Negotiation Drafter**: Generates courteous, data-backed counter-offers citing local corridor benchmarks with direct WhatsApp URL integration.
 
 ---
 

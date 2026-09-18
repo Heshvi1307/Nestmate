@@ -150,3 +150,75 @@ export async function verifyAndTriagePhoto(formData: FormData): Promise<SnapFixV
   }
   return res.json();
 }
+
+// ==========================================
+// Pillar 4: TrueCost Index API Client
+// ==========================================
+
+import {
+  PropertyCostInput,
+  TrueCostReport,
+  ComparisonResult,
+  NegotiationDraft,
+  CorridorBenchmarksMap
+} from '../types/truecost';
+
+export async function fetchTrueCostCorridors(): Promise<CorridorBenchmarksMap> {
+  const res = await fetch(`${API_BASE_URL}/api/truecost/corridors`);
+  if (!res.ok) throw new Error('Failed to fetch corridor benchmarks');
+  const data = await res.json();
+  return data.cities;
+}
+
+export async function calculateTrueCost(payload: PropertyCostInput): Promise<TrueCostReport> {
+  const res = await fetch(`${API_BASE_URL}/api/truecost/calculate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to calculate TrueCost');
+  }
+  const data = await res.json();
+  return data.report;
+}
+
+export async function compareProperties(
+  flatA: PropertyCostInput,
+  flatB: PropertyCostInput
+): Promise<ComparisonResult> {
+  const res = await fetch(`${API_BASE_URL}/api/truecost/compare`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ flat_a: flatA, flat_b: flatB }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to compare properties');
+  }
+  const data = await res.json();
+  return data.comparison;
+}
+
+export async function generateRentNegotiation(payload: {
+  property_name: string;
+  base_rent: number;
+  corridor_benchmark_rent: number;
+  maintenance?: number;
+  deposit_months?: number;
+  landlord_name?: string;
+}): Promise<NegotiationDraft> {
+  const res = await fetch(`${API_BASE_URL}/api/truecost/negotiate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to generate negotiation draft');
+  }
+  const data = await res.json();
+  return data.negotiation;
+}
+

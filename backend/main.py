@@ -334,6 +334,81 @@ async def verify_and_triage_photo(
         "certificate": certificate
     }
 
+# ==========================================
+# 5. TrueCost Index Endpoints (Pillar 4)
+# ==========================================
+
+from services.truecost_service import (
+    CORRIDOR_BENCHMARKS,
+    PropertyCostInput,
+    calculate_single_true_cost,
+    compare_two_properties,
+    generate_whatsapp_negotiation
+)
+
+class ComparePropertiesRequest(BaseModel):
+    flat_a: PropertyCostInput
+    flat_b: PropertyCostInput
+
+class NegotiationRequest(BaseModel):
+    property_name: str
+    base_rent: float
+    corridor_benchmark_rent: float
+    maintenance: float = 0.0
+    deposit_months: float = 2.0
+    landlord_name: Optional[str] = "Owner"
+
+@app.get("/api/truecost/corridors")
+def get_truecost_corridors():
+    """
+    Returns hyper-local micro-corridor rent and maintenance benchmarks.
+    """
+    return {
+        "success": True,
+        "cities": CORRIDOR_BENCHMARKS
+    }
+
+@app.post("/api/truecost/calculate")
+def calculate_truecost(payload: PropertyCostInput):
+    """
+    Calculates 11-month Total Cost of Occupancy (TCO), hidden overheads,
+    deposit opportunity cost, and corridor market position.
+    """
+    report = calculate_single_true_cost(payload)
+    return {
+        "success": True,
+        "report": report
+    }
+
+@app.post("/api/truecost/compare")
+def compare_properties(payload: ComparePropertiesRequest):
+    """
+    Direct side-by-side financial and lifestyle comparison between two properties.
+    """
+    comparison = compare_two_properties(payload.flat_a, payload.flat_b)
+    return {
+        "success": True,
+        "comparison": comparison
+    }
+
+@app.post("/api/truecost/negotiate")
+def get_whatsapp_negotiation(payload: NegotiationRequest):
+    """
+    Generates a courteous, data-backed WhatsApp negotiation draft and direct link.
+    """
+    draft = generate_whatsapp_negotiation(
+        property_name=payload.property_name,
+        base_rent=payload.base_rent,
+        corridor_benchmark_rent=payload.corridor_benchmark_rent,
+        maintenance=payload.maintenance,
+        deposit_months=payload.deposit_months,
+        landlord_name=payload.landlord_name
+    )
+    return {
+        "success": True,
+        "negotiation": draft
+    }
+
 if __name__ == "__main__":
     import uvicorn
     host = os.environ.get("HOST", "0.0.0.0")
