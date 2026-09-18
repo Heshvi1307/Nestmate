@@ -19,7 +19,12 @@ TENANCY_BENCHMARKS: Dict[str, Dict[str, Any]] = {
             "forfeit entirely",
             "forfeiture of full deposit",
             "forfeit the entire deposit",
-            "no refund under any circumstance"
+            "forfeit the entire security deposit",
+            "forfeiture of deposit",
+            "no refund under any circumstance",
+            "non-refundable maintenance fee",
+            "deducted at checkout",
+            "mandatory repainting and deep sanitization"
         ]
     },
     "landlord_entry": {
@@ -30,10 +35,15 @@ TENANCY_BENCHMARKS: Dict[str, Dict[str, Any]] = {
         "risk_penalty": 20,
         "dealbreakers": [
             "at any time without notice",
+            "at any time without prior notice",
             "enter at will",
             "without prior notice",
+            "without notice",
             "no notice required for inspection",
-            "unrestricted access without notification"
+            "unrestricted access without notification",
+            "surprise discipline audits",
+            "enter rooms at any time",
+            "enter at any time"
         ]
     },
     "rent_escalation": {
@@ -46,8 +56,12 @@ TENANCY_BENCHMARKS: Dict[str, Dict[str, Any]] = {
             "arbitrary increase",
             "increase rent at sole discretion",
             "hike rent at any time",
+            "increase rent at any time",
+            "increase rent by 15%",
             "increase above 15%",
-            "without tenant consent"
+            "without tenant consent",
+            "at sole discretion",
+            "verbal notice"
         ]
     },
     "maintenance_liability": {
@@ -57,8 +71,18 @@ TENANCY_BENCHMARKS: Dict[str, Dict[str, Any]] = {
         "risk_penalty": 20,
         "dealbreakers": [
             "tenant responsible for all repairs",
+            "lessee agrees that he shall be responsible for all repairs",
+            "responsible for all repairs of every nature",
+            "responsible for all repairs",
             "tenant bears all structural damages",
             "landlord shall not carry out any repairs",
+            "lessor shall have no obligation to spend on repairs",
+            "no obligation to spend on repairs",
+            "structural cracks",
+            "external roof seepage",
+            "roof seepage",
+            "wall plastering",
+            "main drainage blockages",
             "including seepage and plumbing",
             "all maintenance regardless of fault"
         ]
@@ -71,9 +95,15 @@ TENANCY_BENCHMARKS: Dict[str, Dict[str, Any]] = {
         "dealbreakers": [
             "immediate eviction without notice",
             "cut off electricity or water",
+            "disconnect water and electricity",
             "disconnect essential supplies",
             "lock the premises upon delay",
-            "pay rent for entire remaining lease term upon early exit"
+            "change the physical door lock",
+            "resume possession without initiating proceedings",
+            "without initiating proceedings before any court or rent authority",
+            "pay rent for entire remaining lease term upon early exit",
+            "early vacating requires complete forfeiture of deposit",
+            "forfeit the entire security deposit"
         ]
     }
 }

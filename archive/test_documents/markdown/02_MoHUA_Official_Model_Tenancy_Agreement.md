@@ -1,0 +1,36 @@
+# Public Case 2: MoHUA Model Tenancy Benchmark (MTA 2021)
+> **Jurisdiction:** Central Statutory Benchmark (Ministry of Housing & Urban Affairs)  
+> **Expected RentFair Verdict:** `SAFE`  
+> **Target Safety Score:** `95-100 / 100`  
+
+---
+
+### Benchmark Case Summary
+Standard government benchmark agreement compliant with Model Tenancy Act, 2021: 2-month deposit cap (INR 48,000), 30-day refund window, 24-hour advance written daylight entry notice, and clear maintenance division.
+
+---
+
+### Agreement Full Text
+```text
+MODEL TENANCY AGREEMENT (MINISTRY OF HOUSING & URBAN AFFAIRS BENCHMARK)
+
+This Tenancy Agreement is executed on 1st November 2025, between Smt. Radhika Mehta (LANDLORD) and Shri Aarav Deshmukh (TENANT).
+
+1. PREMISES & RENT:
+The Landlord lets out Residential Unit 14B, Green Avenue, Ahmedabad. The agreed monthly rent is INR 24,000/- payable on or before the 7th of each month.
+
+2. SECURITY DEPOSIT:
+In compliance with Section 11 of the Model Tenancy Act, 2021, the Tenant has deposited INR 48,000/- (equivalent to two months' rent) as refundable security deposit. The Landlord shall refund this deposit within 30 days of handover of vacant possession, subject to joint inspection for actual tenant-caused damage excluding normal wear and tear.
+
+3. ENTRY & INSPECTION NOTICE:
+As per Section 15 of the MTA, the Landlord or authorized agent shall provide at least twenty-four (24) hours' prior written or electronic notice specifying the day, time, and reason for entry. All entries shall occur during daylight hours (between 8:00 AM and 7:00 PM).
+
+4. MAINTENANCE OBLIGATIONS:
+In accordance with the Second Schedule of the Model Tenancy Act, structural repairs, exterior maintenance, major plumbing lines, and external whitewashing shall be the responsibility of the Landlord. The Tenant shall bear only minor routine consumable repairs under INR 500.
+
+5. RENT REVISION & TERMINATION:
+Rent shall remain fixed during the 11-month term. Any renewal revision requires at least 90 days prior written notice. Either party may terminate the tenancy with one month (30 days) written notice.
+```
+
+---
+*RentFair AI Test Document Archive — Conforming to Model Tenancy Act (MTA), 2021 Benchmarks.*

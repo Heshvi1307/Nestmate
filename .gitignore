@@ -10,6 +10,8 @@ Hackathon_rulebook.pdf.pdf
 c8a841a2d16e47d69fab49fc5ece80cc.pdf
 *.pdf
 *.pdf.pdf
+!archive/test_documents/**
+!archive/test_documents/**/*.pdf
 
 # Python
 __pycache__/
