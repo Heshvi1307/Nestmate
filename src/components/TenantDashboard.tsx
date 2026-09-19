@@ -27,6 +27,9 @@ import { LeaseLens } from './LeaseLens';
 import { CommunicationCenter } from './CommunicationCenter';
 import { RoommateMatching } from './RoommateMatching';
 
+import { useNestMate } from '../context/NestMateContext';
+import { RentPaymentModal } from './RentPaymentModal';
+
 interface TenantDashboardProps {
   onOpenLeaseLens: () => void;
   onOpenAIAssistant: () => void;
@@ -36,9 +39,17 @@ export const TenantDashboard: React.FC<TenantDashboardProps> = ({
   onOpenLeaseLens,
   onOpenAIAssistant
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'overview' | 'maintenance' | 'expenses' | 'documents' | 'messages' | 'roommates'>('overview');
-  const [rentPaid, setRentPaid] = useState(false);
-  const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const { 
+    user, 
+    maintenanceTickets, 
+    rentPaid, 
+    handlePayRent, 
+    showReceiptModal, 
+    setShowReceiptModal 
+  } = useNestMate();
+
+  const [activeSubTab, setActiveSubTab] = useState<'overview' | 'rent' | 'maintenance' | 'expenses' | 'documents' | 'messages' | 'roommates'>('overview');
+  const [isPayModalOpen, setIsPayModalOpen] = useState(false);
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -48,19 +59,10 @@ export const TenantDashboard: React.FC<TenantDashboardProps> = ({
     }).format(val);
   };
 
-  const handlePayRent = () => {
-    setRentPaid(true);
-    setShowReceiptModal(true);
-    confetti({
-      particleCount: 80,
-      spread: 60,
-      origin: { y: 0.6 }
-    });
-  };
-
   const sidebarLinks = [
     { id: 'overview', label: 'Overview', icon: Home },
-    { id: 'maintenance', label: 'Maintenance (1)', icon: Wrench },
+    { id: 'rent', label: 'Rent Management', icon: CreditCard },
+    { id: 'maintenance', label: `Maintenance (${maintenanceTickets.filter(t => t.status !== 'Resolved').length})`, icon: Wrench },
     { id: 'expenses', label: 'Expenses & Split', icon: TrendingUp },
     { id: 'documents', label: 'LeaseLens & Docs', icon: FileText },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
@@ -347,6 +349,151 @@ export const TenantDashboard: React.FC<TenantDashboardProps> = ({
             <MaintenanceHub onOpenMessageWithTechnician={() => setActiveSubTab('messages')} />
           )}
 
+          {/* ==================================================
+              SUB-VIEW: RENT MANAGEMENT (Section 20)
+              ================================================== */}
+          {activeSubTab === 'rent' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-4">
+                <div>
+                  <h3 className="text-lg font-black text-text-primary">
+                    Rent & Digital Ledger
+                  </h3>
+                  <p className="text-xs text-text-secondary">
+                    Track recurring rental liabilities, security deposit escrow, and past clearance receipts.
+                  </p>
+                </div>
+
+                {!rentPaid ? (
+                  <button
+                    onClick={() => setIsPayModalOpen(true)}
+                    className="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-hover text-white text-xs font-black shadow-card transition-all flex items-center space-x-2 self-start sm:self-auto"
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    <span>Pay September Rent (0% UPI)</span>
+                  </button>
+                ) : (
+                  <span className="text-xs font-extrabold text-emerald-800 bg-emerald-100 px-3 py-1.5 rounded-xl flex items-center space-x-1.5 self-start sm:self-auto">
+                    <CheckCircle2 className="w-4 h-4 text-success" />
+                    <span>September Rent Cleared</span>
+                  </span>
+                )}
+              </div>
+
+              {/* Top Rent Breakdown Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div className="bg-surface p-4 rounded-2xl border border-border shadow-subtle space-y-1">
+                  <span className="text-[10px] font-black text-text-muted uppercase tracking-wider block">Current Base Rent</span>
+                  <div className="text-2xl font-black text-primary tabular-nums">₹24,000</div>
+                  <span className="text-[10px] text-text-muted">Due 1st of every month</span>
+                </div>
+
+                <div className="bg-surface p-4 rounded-2xl border border-border shadow-subtle space-y-1">
+                  <span className="text-[10px] font-black text-text-muted uppercase tracking-wider block">Deposit in Escrow</span>
+                  <div className="text-2xl font-black text-text-primary tabular-nums">₹48,000</div>
+                  <span className="text-[10px] text-emerald-800 font-semibold">✓ 100% Protected</span>
+                </div>
+
+                <div className="bg-surface p-4 rounded-2xl border border-border shadow-subtle space-y-1">
+                  <span className="text-[10px] font-black text-text-muted uppercase tracking-wider block">Maintenance Dues</span>
+                  <div className="text-2xl font-black text-text-primary tabular-nums">₹1,200</div>
+                  <span className="text-[10px] text-text-muted">Society upkeep included</span>
+                </div>
+
+                <div className="bg-surface p-4 rounded-2xl border border-border shadow-subtle space-y-1">
+                  <span className="text-[10px] font-black text-text-muted uppercase tracking-wider block">Estimated Utilities</span>
+                  <div className="text-2xl font-black text-text-primary tabular-nums">~₹2,800</div>
+                  <span className="text-[10px] text-text-muted">Torrent Power + Gas</span>
+                </div>
+              </div>
+
+              {/* Payment History Timeline (Section 20 requirement) */}
+              <div className="bg-surface p-6 rounded-3xl border border-border shadow-card space-y-4">
+                <span className="text-xs font-black text-text-primary uppercase tracking-wider block">
+                  Rental Payment History Timeline
+                </span>
+
+                <div className="space-y-3">
+                  {/* September */}
+                  <div className="p-4 rounded-2xl bg-surface border border-border flex items-center justify-between text-xs">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold ${
+                        rentPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                      }`}>
+                        {rentPaid ? <CheckCircle2 className="w-4 h-4 text-success" /> : <Clock className="w-4 h-4 text-warning" />}
+                      </div>
+                      <div>
+                        <span className="font-extrabold text-text-primary block text-sm">September 2026</span>
+                        <span className="text-[11px] text-text-muted">Due date: 1st September 2026</span>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <span className="font-black text-sm text-text-primary block">₹24,000</span>
+                      <span className={`text-[11px] font-bold ${rentPaid ? 'text-emerald-700' : 'text-amber-700'}`}>
+                        {rentPaid ? 'Paid via UPI Mandate' : 'Due in 5 days'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* August */}
+                  <div className="p-4 rounded-2xl bg-surfaceMuted/30 border border-border flex items-center justify-between text-xs">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+                        <CheckCircle2 className="w-4 h-4 text-success" />
+                      </div>
+                      <div>
+                        <span className="font-extrabold text-text-primary block text-sm">August 2026</span>
+                        <span className="text-[11px] text-text-muted">Cleared 1st August 2026</span>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <span className="font-black text-sm text-text-primary block">₹24,000</span>
+                      <span className="text-[11px] font-bold text-emerald-700">Paid · Receipt #NMR-AUG-402</span>
+                    </div>
+                  </div>
+
+                  {/* July */}
+                  <div className="p-4 rounded-2xl bg-surfaceMuted/30 border border-border flex items-center justify-between text-xs">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+                        <CheckCircle2 className="w-4 h-4 text-success" />
+                      </div>
+                      <div>
+                        <span className="font-extrabold text-text-primary block text-sm">July 2026</span>
+                        <span className="text-[11px] text-text-muted">Cleared 1st July 2026</span>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <span className="font-black text-sm text-text-primary block">₹24,000</span>
+                      <span className="text-[11px] font-bold text-emerald-700">Paid · Receipt #NMR-JUL-402</span>
+                    </div>
+                  </div>
+
+                  {/* June */}
+                  <div className="p-4 rounded-2xl bg-surfaceMuted/30 border border-border flex items-center justify-between text-xs">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+                        <CheckCircle2 className="w-4 h-4 text-success" />
+                      </div>
+                      <div>
+                        <span className="font-extrabold text-text-primary block text-sm">June 2026</span>
+                        <span className="text-[11px] text-text-muted">Cleared 1st June 2026</span>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <span className="font-black text-sm text-text-primary block">₹24,000</span>
+                      <span className="text-[11px] font-bold text-emerald-700">Paid · Receipt #NMR-JUN-402</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* EXPENSES TAB */}
           {activeSubTab === 'expenses' && (
             <ExpenseTransparency />
@@ -370,6 +517,19 @@ export const TenantDashboard: React.FC<TenantDashboardProps> = ({
         </div>
 
       </div>
+
+      {/* Rent Payment Modal (Section 20) */}
+      <RentPaymentModal
+        isOpen={isPayModalOpen}
+        onClose={() => setIsPayModalOpen(false)}
+        onPaymentSuccess={() => {
+          handlePayRent();
+          setIsPayModalOpen(false);
+        }}
+        amount={24000}
+        unit="Flat 402, The Solitaire Terraces, Vastrapur"
+        landlordName="Vikramaditya Sanghavi"
+      />
 
       {/* Rent Payment Receipt Modal */}
       {showReceiptModal && (

@@ -47,7 +47,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
     {
       id: 'init-1',
       sender: 'nora',
-      text: 'Namaste! I am NORA, your personal housing concierge on NESTORA. How can I help make renting transparent and effortless today?',
+      text: 'Namaste! I am NORA, your personal housing concierge on NestMate. How can I help make renting transparent and effortless today?',
       timestamp: 'Just now',
     }
   ]);
@@ -101,7 +101,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
         noraReply = {
           id: `nora-${Date.now()}`,
           sender: 'nora',
-          text: 'At NESTORA, we eliminate hidden-cost anxiety through TrueCost™. A standard base rent of ₹24,000 typically translates to ~₹28,600 in total monthly living expenses. Here is the realistic breakdown:',
+          text: 'At NestMate, we eliminate hidden-cost anxiety through TrueCost™. A standard base rent of ₹24,000 typically translates to ~₹28,600 in total monthly living expenses. Here is the realistic breakdown:',
           timestamp: 'Just now',
           cardType: 'true_cost_calc',
           cardData: {
@@ -131,7 +131,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
         noraReply = {
           id: `nora-${Date.now()}`,
           sender: 'nora',
-          text: 'Plumbing leaks are treated with High Urgency on NESTORA. You already have an active ticket tracked live with Rahul Services!',
+          text: 'Plumbing leaks are treated with High Urgency on NestMate. You already have an active ticket tracked live with Rahul Services!',
           timestamp: 'Just now',
           cardType: 'maintenance_action',
           cardData: {
@@ -145,7 +145,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
         noraReply = {
           id: `nora-${Date.now()}`,
           sender: 'nora',
-          text: 'Here is your frictionless NESTORA Digital Move-In Checklist to guarantee 100% security deposit safety:',
+          text: 'Here is your frictionless NestMate Digital Move-In Checklist to guarantee 100% security deposit safety:',
           timestamp: 'Just now',
           cardType: 'checklist',
           cardData: {

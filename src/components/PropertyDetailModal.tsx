@@ -34,6 +34,9 @@ interface PropertyDetailModalProps {
   onAskNoraAboutProperty: (property: Property) => void;
   isSaved: boolean;
   onToggleSave: (id: string) => void;
+  onOpenAffordabilityCalculator?: (property: Property) => void;
+  onToggleCompare?: (property: Property) => void;
+  isInCompare?: boolean;
 }
 
 export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
@@ -41,7 +44,10 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   onClose,
   onAskNoraAboutProperty,
   isSaved,
-  onToggleSave
+  onToggleSave,
+  onOpenAffordabilityCalculator,
+  onToggleCompare,
+  isInCompare = false
 }) => {
   const [activeMediaTab, setActiveMediaTab] = useState<'photos' | 'video' | 'floorplan' | 'map'>('photos');
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
@@ -372,22 +378,78 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
               </div>
 
             </div>
+
+            {/* True Cost Primary CTAs (Section 12 & 13) */}
+            <div className="mt-5 pt-4 border-t border-primary/20 flex flex-wrap items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (onOpenAffordabilityCalculator) onOpenAffordabilityCalculator(property);
+                }}
+                className="px-5 py-3 rounded-xl bg-primary hover:bg-primary-hover text-white text-xs font-black shadow-card transition-all flex items-center space-x-2"
+              >
+                <Sparkles className="w-4 h-4 text-emerald-300" />
+                <span>Can I actually afford this?</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+
+              <div className="flex items-center space-x-2">
+                {onToggleCompare && (
+                  <button
+                    type="button"
+                    onClick={() => onToggleCompare(property)}
+                    className={`px-3.5 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center space-x-1.5 ${
+                      isInCompare
+                        ? 'bg-primary text-white border-primary'
+                        : 'bg-surface border-border text-text-primary hover:bg-surfaceMuted'
+                    }`}
+                  >
+                    <span>{isInCompare ? '✓ In Compare' : '+ Compare'}</span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => onToggleSave(property.id)}
+                  className="px-3.5 py-2.5 rounded-xl border border-border bg-surface hover:bg-surfaceMuted text-xs font-bold text-text-primary flex items-center space-x-1.5 transition-all"
+                >
+                  <Heart className={`w-3.5 h-3.5 ${isSaved ? 'fill-rose-500 text-rose-500' : ''}`} />
+                  <span>{isSaved ? 'Saved' : 'Save'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onAskNoraAboutProperty(property)}
+                  className="px-3.5 py-2.5 rounded-xl border border-border bg-surface hover:bg-surfaceMuted text-xs font-bold text-text-primary flex items-center space-x-1.5 transition-all"
+                >
+                  <Building className="w-3.5 h-3.5 text-primary" />
+                  <span>Contact Landlord</span>
+                </button>
+              </div>
+            </div>
           </section>
 
           {/* ==================================================
-              PROPERTY TRANSPARENCY PANEL - "KNOW BEFORE YOU MOVE IN"
+              PROPERTY TRANSPARENCY PANEL - "KNOW BEFORE YOU MOVE" (Section 14)
               ================================================== */}
           <section className="bg-surface rounded-2xl border border-border p-5 sm:p-7 shadow-subtle space-y-6">
-            <div>
-              <div className="flex items-center space-x-2">
-                <ShieldCheck className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-bold text-text-primary">
-                  Know Before You Move In
-                </h2>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <div className="flex items-center space-x-2">
+                  <ShieldCheck className="w-5 h-5 text-primary" />
+                  <h2 className="text-lg font-bold text-text-primary">
+                    KNOW BEFORE YOU MOVE
+                  </h2>
+                </div>
+                <p className="text-xs text-text-secondary mt-0.5">
+                  Full transparency disclosure based on physical audit and recorded tenancy history.
+                </p>
               </div>
-              <p className="text-xs text-text-secondary mt-0.5">
-                Full transparency disclosure based on physical audit and recorded tenancy history.
-              </p>
+
+              {/* Visibly Labeled Demo Data Tag (Section 14) */}
+              <span className="text-[11px] font-bold text-text-muted bg-surfaceMuted border border-border px-2.5 py-1 rounded-md self-start">
+                Demo data · Sample verified profile
+              </span>
             </div>
 
             {/* 6 Transparency Verification Checks */}
@@ -583,17 +645,27 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
           </div>
 
           <div className="flex items-center space-x-2.5 w-full sm:w-auto">
+            {onOpenAffordabilityCalculator && (
+              <button
+                type="button"
+                onClick={() => onOpenAffordabilityCalculator(property)}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-primary-light text-primary border border-primary/30 text-xs font-extrabold hover:bg-primary hover:text-white transition-all flex items-center justify-center space-x-1.5"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-secondary" />
+                <span>Can I afford this?</span>
+              </button>
+            )}
+
             <button
               onClick={() => onAskNoraAboutProperty(property)}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-border text-xs font-bold text-text-primary hover:bg-surfaceMuted transition-colors flex items-center justify-center space-x-1.5"
+              className="w-full sm:w-auto px-3.5 py-2.5 rounded-xl border border-border text-xs font-bold text-text-primary hover:bg-surfaceMuted transition-colors flex items-center justify-center space-x-1.5"
             >
-              <Sparkles className="w-3.5 h-3.5 text-secondary" />
               <span>Ask NORA</span>
             </button>
 
             <button
               onClick={handleBookVisit}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-hover text-white text-xs font-bold shadow-card transition-all flex items-center justify-center space-x-2"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-hover text-white text-xs font-bold shadow-card transition-all flex items-center justify-center space-x-2"
             >
               <Calendar className="w-3.5 h-3.5" />
               <span>Book Verified Visit</span>

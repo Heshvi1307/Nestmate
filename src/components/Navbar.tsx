@@ -29,6 +29,8 @@ interface NavbarProps {
   onOpenAIAssistant: () => void;
   notifications: NotificationItem[];
   onMarkNotificationRead: (id: string) => void;
+  onOpenLandingPage?: () => void;
+  onOpenOnboarding?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -41,7 +43,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenCompare,
   onOpenAIAssistant,
   notifications,
-  onMarkNotificationRead
+  onMarkNotificationRead,
+  onOpenLandingPage,
+  onOpenOnboarding
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
@@ -81,7 +85,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
             <div>
               <span className="font-bold text-lg tracking-tight text-text-primary group-hover:text-primary transition-colors">
-                NESTORA
+                Nest<span className="text-primary font-black">Mate</span>
               </span>
               <span className="hidden sm:block text-[10px] text-text-muted uppercase tracking-widest font-semibold -mt-1">
                 Transparent Living
@@ -274,8 +278,32 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </button>
                   ))}
                 </div>
-                <div className="mt-2 pt-2 border-t border-border px-2 text-[10px] text-text-muted leading-tight">
-                  NESTORA adapts dashboards and permissions dynamically based on role.
+                <div className="mt-2 pt-2 border-t border-border px-2 text-[10px] text-text-muted leading-tight space-y-1.5">
+                  <div>NestMate adapts dashboards and permissions dynamically based on role.</div>
+                  <div className="flex items-center justify-between pt-1 border-t border-border/60">
+                    {onOpenOnboarding && (
+                      <button
+                        onClick={() => {
+                          setRoleDropdownOpen(false);
+                          onOpenOnboarding();
+                        }}
+                        className="text-[11px] font-bold text-primary hover:underline"
+                      >
+                        ⚡ Re-run Onboarding
+                      </button>
+                    )}
+                    {onOpenLandingPage && (
+                      <button
+                        onClick={() => {
+                          setRoleDropdownOpen(false);
+                          onOpenLandingPage();
+                        }}
+                        className="text-[11px] font-bold text-text-secondary hover:text-primary hover:underline"
+                      >
+                        View Landing Page
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

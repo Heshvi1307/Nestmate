@@ -9,12 +9,16 @@ import {
   SlidersHorizontal, 
   List, 
   Map as MapIcon, 
-  RotateCcw,
+  Scale,
+  Zap,
+  Building,
   CheckCircle2,
-  Scale
+  Wrench,
+  Calculator,
+  ArrowRight
 } from 'lucide-react';
-import { Property, UserRole, NotificationItem } from './types';
-import { MOCK_PROPERTIES, MOCK_NOTIFICATIONS } from './data/mockData';
+import { Property, UserRole } from './types';
+import { NestMateProvider, useNestMate } from './context/NestMateContext';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { PropertyCard } from './components/PropertyCard';
@@ -31,65 +35,59 @@ import { PropertyManagerDashboard } from './components/PropertyManagerDashboard'
 import { TrustCenter } from './components/TrustCenter';
 import { AIAssistantModal } from './components/AIAssistantModal';
 import { Footer } from './components/Footer';
+import { LandingPage } from './components/LandingPage';
+import { OnboardingModal } from './components/OnboardingModal';
+import { AffordabilityCalculatorModal } from './components/AffordabilityCalculatorModal';
+import { AddPropertyWizardModal } from './components/AddPropertyWizardModal';
+import { RentPaymentModal } from './components/RentPaymentModal';
 
-export function App() {
-  // Navigation & Role State
-  const [currentTab, setCurrentTab] = useState<string>('explore');
-  const [userRole, setUserRole] = useState<UserRole>('tenant');
+function NestMateMainContent() {
+  const {
+    user,
+    userRole,
+    setUserRole,
+    currentTab,
+    setCurrentTab,
+    showLandingPage,
+    setShowLandingPage,
+    showOnboardingModal,
+    setShowOnboardingModal,
+    loginAsDemoTenant,
+    loginAsDemoLandlord,
+    properties,
+    savedPropertyIds,
+    toggleSaveProperty,
+    compareProperties,
+    toggleCompareProperty,
+    clearCompare,
+    selectedProperty,
+    setSelectedProperty,
+    hoveredPropertyId,
+    setHoveredPropertyId,
+    isFilterDrawerOpen,
+    setIsFilterDrawerOpen,
+    isCompareModalOpen,
+    setIsCompareModalOpen,
+    isAIAssistantOpen,
+    setIsAIAssistantOpen,
+    isAddPropertyWizardOpen,
+    setIsAddPropertyWizardOpen,
+    isAffordabilityModalOpen,
+    setIsAffordabilityModalOpen,
+    affordabilityProperty,
+    openAffordabilityCalculator,
+    showReceiptModal,
+    setShowReceiptModal,
+    handlePayRent,
+    notifications,
+    markNotificationRead
+  } = useNestMate();
 
-  // Properties State
-  const [properties, setProperties] = useState<Property[]>(MOCK_PROPERTIES);
-  const [savedPropertyIds, setSavedPropertyIds] = useState<string[]>(['prop-1']);
-  const [compareProperties, setCompareProperties] = useState<Property[]>([MOCK_PROPERTIES[0], MOCK_PROPERTIES[1]]);
-  
-  // Interactive Hover & Selection
-  const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(null);
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
-
-  // Modals & Drawers
-  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
-  const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
-
-  // Filters State
+  // Local Filters State for Explore Tab
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [searchLocation, setSearchLocation] = useState<string>('All Ahmedabad');
   const [sortBy, setSortBy] = useState<'recommended' | 'trueCostAsc' | 'priceAsc' | 'inspectionDesc'>('recommended');
-
-  // Mobile Map/List View Toggle
   const [mobileViewMode, setMobileViewMode] = useState<'list' | 'map'>('list');
-
-  // Notifications State
-  const [notifications, setNotifications] = useState<NotificationItem[]>(MOCK_NOTIFICATIONS);
-
-  // Toggle Save / Wishlist
-  const handleToggleSave = (id: string, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (savedPropertyIds.includes(id)) {
-      setSavedPropertyIds(savedPropertyIds.filter(item => item !== id));
-    } else {
-      setSavedPropertyIds([...savedPropertyIds, id]);
-    }
-  };
-
-  // Toggle Compare (Max 3)
-  const handleToggleCompare = (property: Property, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    const exists = compareProperties.some(p => p.id === property.id);
-    if (exists) {
-      setCompareProperties(compareProperties.filter(p => p.id !== property.id));
-    } else {
-      if (compareProperties.length < 3) {
-        setCompareProperties([...compareProperties, property]);
-      } else {
-        alert('You can compare up to 3 properties at a time.');
-      }
-    }
-  };
-
-  const handleMarkNotificationRead = (id: string) => {
-    setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
-  };
 
   // Filter application from Hero
   const handleHeroSearch = (params: { location: string; moveIn: string; budget: string; type: string }) => {
@@ -106,7 +104,6 @@ export function App() {
       setFilters(prev => ({ ...prev, propertyTypes: [params.type] }));
     }
 
-    // Smooth scroll down to property listing section
     const element = document.getElementById('explore-listings');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -205,9 +202,100 @@ export function App() {
     });
   }, [properties, searchLocation, filters, sortBy]);
 
+  // If user is currently viewing Landing Page
+  if (showLandingPage) {
+    return (
+      <>
+        <LandingPage
+          onOpenAuth={() => setShowOnboardingModal(true)}
+          onExploreSpaces={() => {
+            setShowLandingPage(false);
+            setCurrentTab('explore');
+          }}
+          onFindMatch={() => {
+            setShowLandingPage(false);
+            setCurrentTab('roommates');
+          }}
+        />
+
+        {/* Auth / Onboarding Modal (Can be launched directly from Landing Page) */}
+        <OnboardingModal
+          isOpen={showOnboardingModal}
+          onClose={() => setShowOnboardingModal(false)}
+        />
+      </>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F7F7F4] text-text-primary antialiased font-sans">
       
+      {/* Quick Judge Demo Bar */}
+      <div className="bg-[#171A18] text-white text-[11px] py-1.5 px-4 flex flex-wrap items-center justify-between gap-2 border-b border-white/10">
+        <div className="flex items-center space-x-2">
+          <span className="bg-primary px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider text-white">
+            Judge Fast-Track
+          </span>
+          <span className="text-zinc-300 hidden sm:inline">
+            1-Click Demo Presets & Wow Moments:
+          </span>
+        </div>
+
+        <div className="flex items-center flex-wrap gap-1.5">
+          <button
+            onClick={loginAsDemoTenant}
+            className={`px-2.5 py-0.5 rounded text-[10px] font-bold transition-colors ${
+              userRole === 'tenant' ? 'bg-primary text-white' : 'bg-white/10 hover:bg-white/20 text-zinc-200'
+            }`}
+          >
+            👤 Tenant (Het)
+          </button>
+
+          <button
+            onClick={loginAsDemoLandlord}
+            className={`px-2.5 py-0.5 rounded text-[10px] font-bold transition-colors ${
+              userRole === 'landlord' ? 'bg-primary text-white' : 'bg-white/10 hover:bg-white/20 text-zinc-200'
+            }`}
+          >
+            🏢 Landlord (Vikramaditya)
+          </button>
+
+          <button
+            onClick={() => openAffordabilityCalculator(properties[0])}
+            className="px-2.5 py-0.5 rounded bg-emerald-900/60 hover:bg-emerald-800 text-emerald-200 border border-emerald-500/30 text-[10px] font-bold flex items-center space-x-1"
+          >
+            <Calculator className="w-3 h-3 text-emerald-400" />
+            <span>Wow #1: TrueCost</span>
+          </button>
+
+          <button
+            onClick={() => setCurrentTab('leaselens')}
+            className="px-2.5 py-0.5 rounded bg-blue-900/60 hover:bg-blue-800 text-blue-200 border border-blue-500/30 text-[10px] font-bold flex items-center space-x-1"
+          >
+            <FileText className="w-3 h-3 text-blue-400" />
+            <span>Wow #2: LeaseLens</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setUserRole('landlord');
+              setCurrentTab('dashboard');
+            }}
+            className="px-2.5 py-0.5 rounded bg-amber-900/60 hover:bg-amber-800 text-amber-200 border border-amber-500/30 text-[10px] font-bold flex items-center space-x-1"
+          >
+            <Wrench className="w-3 h-3 text-amber-400" />
+            <span>Wow #3: Maintenance</span>
+          </button>
+
+          <button
+            onClick={() => setShowLandingPage(true)}
+            className="px-2.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-zinc-300 text-[10px] font-medium"
+          >
+            Marketing Tour
+          </button>
+        </div>
+      </div>
+
       {/* Top Navigation */}
       <Navbar
         currentTab={currentTab}
@@ -219,14 +307,16 @@ export function App() {
         onOpenCompare={() => setIsCompareModalOpen(true)}
         onOpenAIAssistant={() => setIsAIAssistantOpen(true)}
         notifications={notifications}
-        onMarkNotificationRead={handleMarkNotificationRead}
+        onMarkNotificationRead={markNotificationRead}
+        onOpenLandingPage={() => setShowLandingPage(true)}
+        onOpenOnboarding={() => setShowOnboardingModal(true)}
       />
 
       {/* Main Content Area */}
       <main className="flex-1">
         
         {/* ==================================================
-            TAB 1: EXPLORE (LANDING HERO + SPLIT SCREEN 40/60 DISCOVERY)
+            TAB 1: EXPLORE (HERO + 40/60 DISCOVERY WORKSPACE)
             ================================================== */}
         {currentTab === 'explore' && (
           <div className="space-y-8">
@@ -242,7 +332,7 @@ export function App() {
               }}
             />
 
-            {/* Split Screen Discovery Workspace Container */}
+            {/* Split Screen Discovery Workspace */}
             <div id="explore-listings" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
               
               {/* AI Natural Language Search Console */}
@@ -260,7 +350,7 @@ export function App() {
                     Verified Spaces in Ahmedabad ({filteredProperties.length})
                   </h2>
                   <p className="text-xs text-text-muted mt-0.5">
-                    Live interactive split-view. Hovering on cards highlights map pins.
+                    Live interactive split-view. Hovering on cards highlights map pins. Click any card to inspect TrueCost and schedule visits.
                   </p>
                 </div>
 
@@ -316,12 +406,10 @@ export function App() {
                 </div>
               </div>
 
-              {/* ==================================================
-                  SPLIT SCREEN DISCOVERY LAYOUT (40% LIST / 60% MAP)
-                  ================================================== */}
+              {/* SPLIT SCREEN DISCOVERY LAYOUT (40% LIST / 60% MAP) */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 
-                {/* LEFT: 40% Property Cards List (5 cols on 12-col grid = ~41.6%) */}
+                {/* LEFT: 40% Property Cards List */}
                 <div className={`lg:col-span-5 space-y-4 ${
                   mobileViewMode === 'map' ? 'hidden lg:block' : 'block'
                 }`}>
@@ -355,14 +443,14 @@ export function App() {
                         isInCompare={compareProperties.some(p => p.id === prop.id)}
                         onHover={(id) => setHoveredPropertyId(id)}
                         onClick={(p) => setSelectedProperty(p)}
-                        onToggleSave={handleToggleSave}
-                        onToggleCompare={handleToggleCompare}
+                        onToggleSave={(id, e) => toggleSaveProperty(id, e)}
+                        onToggleCompare={(p, e) => toggleCompareProperty(p, e)}
                       />
                     ))
                   )}
                 </div>
 
-                {/* RIGHT: 60% Interactive Spatial Map (7 cols on 12-col grid = ~58.3%) */}
+                {/* RIGHT: 60% Interactive Spatial Map */}
                 <div className={`lg:col-span-7 sticky top-24 ${
                   mobileViewMode === 'list' ? 'hidden lg:block' : 'block'
                 }`}>
@@ -513,7 +601,7 @@ export function App() {
           </button>
 
           <button
-            onClick={() => setCompareProperties([])}
+            onClick={clearCompare}
             className="text-zinc-400 hover:text-white text-[11px] font-semibold"
           >
             Clear
@@ -525,12 +613,15 @@ export function App() {
       <PropertyDetailModal
         property={selectedProperty}
         onClose={() => setSelectedProperty(null)}
-        onAskNoraAboutProperty={(p) => {
+        onAskNoraAboutProperty={() => {
           setSelectedProperty(null);
           setIsAIAssistantOpen(true);
         }}
         isSaved={selectedProperty ? savedPropertyIds.includes(selectedProperty.id) : false}
-        onToggleSave={(id) => handleToggleSave(id)}
+        onToggleSave={(id) => toggleSaveProperty(id)}
+        onOpenAffordabilityCalculator={(prop) => openAffordabilityCalculator(prop)}
+        onToggleCompare={(prop) => toggleCompareProperty(prop)}
+        isInCompare={selectedProperty ? compareProperties.some(p => p.id === selectedProperty.id) : false}
       />
 
       {/* Property Comparison Modal */}
@@ -538,7 +629,10 @@ export function App() {
         isOpen={isCompareModalOpen}
         onClose={() => setIsCompareModalOpen(false)}
         properties={compareProperties}
-        onRemoveProperty={(id) => setCompareProperties(compareProperties.filter(p => p.id !== id))}
+        onRemoveProperty={(id) => {
+          const propToRemove = compareProperties.find(p => p.id === id);
+          if (propToRemove) toggleCompareProperty(propToRemove);
+        }}
         onViewDetails={(p) => {
           setSelectedProperty(p);
           setIsCompareModalOpen(false);
@@ -564,10 +658,56 @@ export function App() {
         properties={properties}
       />
 
+      {/* Onboarding Modal (First Screen / Re-run) */}
+      <OnboardingModal
+        isOpen={showOnboardingModal}
+        onClose={() => setShowOnboardingModal(false)}
+      />
+
+      {/* Wow Moment #1: Affordability Calculator Modal */}
+      <AffordabilityCalculatorModal
+        isOpen={isAffordabilityModalOpen}
+        onClose={() => setIsAffordabilityModalOpen(false)}
+        property={affordabilityProperty}
+        onAskNora={() => {
+          setIsAffordabilityModalOpen(false);
+          setIsAIAssistantOpen(true);
+        }}
+        onViewComparison={() => {
+          setIsAffordabilityModalOpen(false);
+          setIsCompareModalOpen(true);
+        }}
+      />
+
+      {/* Add Property 7-Step Wizard Modal */}
+      <AddPropertyWizardModal
+        isOpen={isAddPropertyWizardOpen}
+        onClose={() => setIsAddPropertyWizardOpen(false)}
+      />
+
+      {/* Rent Payment Modal */}
+      <RentPaymentModal
+        isOpen={showReceiptModal}
+        onClose={() => setShowReceiptModal(false)}
+        onPaymentSuccess={handlePayRent}
+        amount={24000}
+        unit="Flat 402, The Solitaire Terraces, Vastrapur"
+        landlordName="Vikramaditya Sanghavi"
+      />
+
       {/* Global Footer */}
       <Footer onSelectTab={(tab) => setCurrentTab(tab)} />
 
     </div>
   );
 }
+
+export function App() {
+  return (
+    <NestMateProvider>
+      <NestMateMainContent />
+    </NestMateProvider>
+  );
+}
+
 export default App;
