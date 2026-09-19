@@ -1,8 +1,8 @@
 @echo off
-title RentFair AI - Technofora '26 CodeCraft Launcher
+title RentFair AI (Nestmate) - Technofora '26 CodeCraft Launcher
 
 echo ========================================================
-echo        RENTFAIR AI - PROPTECH LIVING PLATFORM
+echo        RENTFAIR AI & NESTMATE - PROPTECH PLATFORM
 echo     Technofora '26 CodeCraft @ Nirma University
 echo ========================================================
 echo.
@@ -28,11 +28,11 @@ if errorlevel 1 (
 :: 3. Setup Backend Environment
 echo [1/4] Checking backend dependencies...
 cd /d "%~dp0backend"
-if not exist "venv" (
+if not exist "venv\Scripts\python.exe" (
     echo Creating Python virtual environment...
     python -m venv venv
 )
-echo Installing backend requirements...
+echo Verifying backend requirements...
 call venv\Scripts\python.exe -m pip install -r requirements.txt --quiet
 
 :: 4. Setup Frontend Environment
@@ -43,20 +43,22 @@ if not exist "node_modules" (
     call npm install
 )
 
-:: 5. Launch Backend in new window
+:: 5. Launch Backend in dedicated window
 echo [3/4] Starting FastAPI backend on http://127.0.0.1:8000 ...
-start "RentFair AI - Backend API" cmd /k "cd /d "%~dp0backend" && venv\Scripts\python.exe main.py"
+start "RentFair AI - Backend API" cmd /k "cd /d %~dp0backend && set PYTHONPATH=. && venv\Scripts\python.exe main.py"
 
-:: 6. Launch Frontend in new window
+:: 6. Launch Frontend in dedicated window
 echo [4/4] Starting Vite frontend on http://localhost:5173 ...
-start "RentFair AI - Frontend Web" cmd /k "cd /d "%~dp0frontend" && npm run dev"
+start "RentFair AI - Frontend Web" cmd /k "cd /d %~dp0frontend && npm run dev"
 
 echo.
 echo ========================================================
-echo   RentFair AI is running!
-echo   - Backend: http://127.0.0.1:8000/docs
-echo   - Frontend: http://localhost:5173
+echo   RentFair AI (Nestmate) is launching!
+echo   - Backend API:  http://127.0.0.1:8000
+echo   - Swagger Docs: http://127.0.0.1:8000/docs
+echo   - Frontend App: http://localhost:5173
 echo ========================================================
 echo.
-timeout /t 3 >nul
+echo Waiting 3 seconds for servers to initialize, then opening browser...
+timeout /t 3 /nobreak >nul
 start http://localhost:5173
