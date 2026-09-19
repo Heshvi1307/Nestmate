@@ -308,7 +308,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   ))}
                 </div>
                 <div className="mt-2 pt-2 border-t border-border px-2 text-[10px] text-text-muted leading-tight">
-                  NESTORA adapts dashboards and permissions dynamically based on role.
+                  NestMate adapts dashboards and permissions dynamically based on role.
                 </div>
               </div>
             )}

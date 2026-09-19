@@ -436,7 +436,7 @@ export const SnapFixTriage: React.FC = () => {
                 Awaiting Live Photo & Defect Selection
               </h4>
               <p className="text-xs text-text-secondary max-w-md mx-auto leading-relaxed">
-                Snap or upload a photo of the move-in condition or damage. RentFair AI will compute the
+                Snap or upload a photo of the move-in condition or damage. NestMate AI will compute the
                 cryptographic hash, evaluate EXIF sensor telemetry, categorize Model Tenancy Act repair duties,
                 and generate an admissible Section 65B electronic certificate.
               </p>

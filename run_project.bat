@@ -1,8 +1,8 @@
 @echo off
-title RentFair AI (Nestmate) - Technofora '26 CodeCraft Launcher
+title NestMate AI - Technofora '26 CodeCraft Launcher
 
 echo ========================================================
-echo        RENTFAIR AI & NESTMATE - PROPTECH PLATFORM
+echo        NESTMATE AI - PROPTECH & SHARED LIVING PLATFORM
 echo     Technofora '26 CodeCraft @ Nirma University
 echo ========================================================
 echo.
@@ -45,7 +45,7 @@ if not exist "node_modules" (
 
 :: 5. Launch Backend in dedicated window
 echo [3/4] Starting FastAPI backend on http://127.0.0.1:8000 ...
-start "RentFair AI - Backend API" cmd /k "cd /d %~dp0backend && set PYTHONPATH=. && venv\Scripts\python.exe main.py"
+start "NestMate AI - Backend API" cmd /k "cd /d %~dp0backend && set PYTHONPATH=. && venv\Scripts\python.exe main.py"
 
 :: 6. Launch Frontend in dedicated window
 echo [4/4] Starting Vite frontend on http://localhost:5173 ...

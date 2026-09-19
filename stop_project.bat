@@ -1,8 +1,8 @@
 @echo off
-title Stop RentFair AI (Nestmate)
+title Stop NestMate AI
 
 echo ========================================================
-echo   Stopping RentFair AI servers (port 8000 & 5173)...
+echo   Stopping NestMate AI servers (port 8000 & 5173)...
 echo ========================================================
 
 :: Kill port 8000 (Backend)

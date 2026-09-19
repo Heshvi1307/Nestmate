@@ -46,7 +46,7 @@ class CounterClauseRequest(BaseModel):
 def health_check():
     return {
         "status": "online",
-        "service": "RentFair AI - Legal Lease Guard",
+        "service": "NestMate AI - Legal Lease Guard",
         "version": "1.0.0",
         "hackathon": "Technofora '26 CodeCraft @ Nirma University"
     }
