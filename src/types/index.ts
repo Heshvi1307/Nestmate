@@ -3,44 +3,21 @@ export interface Property {
   id: string;
   landlord_id: string | null;
   title: string;
-  tagline: string;
+  tagline: string | null;
   neighborhood: string;
   city: string;
-  property_type: string;
-  bedrooms: number;
-  bathrooms: number;
-  carpet_area: number;
-  furnishing: string;
+  property_type: string | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  carpet_area: number | null;
+  furnishing: string | null;
   base_rent: number;
-  deposit: number;
-  utilities_estimate: number;
-  maintenance_monthly: number;
-  internet_monthly: number;
-  total_estimated_monthly: number;
-  move_in_total_cost: number;
-  images: string[];
-  amenities: string[];
-  verified: boolean;
-  verified_owner: boolean;
-  recently_inspected: boolean;
-  fast_response: boolean;
-  rating: number;
-  reviews_count: number;
-  available_from: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  transparency_details: any;
-  coordinates?: {
-    lat: number;
-    lng: number;
-    x: number;
-    y: number;
-  };
-  distances?: {
-    officeMinutes: number;
-    metroMinutes: number;
-    groceryMinutes: number;
-    universityMinutes: number;
-  };
+  deposit: number | null;
+  utilities_estimate: number | null;
+  total_estimated_monthly: number | null;
+  images: string[] | null;
+  amenities: string[] | null;
+  created_at: string;
 }
 
 // ─── Roommate Profile ─────────────────────────────────────────────────────────
@@ -55,6 +32,7 @@ export interface RoommateProfile {
   about_me: string;
   mbti: string;
   interests: string[];
+  created_at?: string;
 }
 
 // ─── Lease Clause ─────────────────────────────────────────────────────────────
@@ -71,31 +49,58 @@ export interface LeaseClause {
   what_to_clarify: string;
 }
 
-// ─── Lease Audit (FastAPI response) ──────────────────────────────────────────
+// ─── Lease Audit Result (FastAPI /api/audit/upload) ───────────────────────────
 export interface AuditedClause {
-  title: string;
-  statutory_reference: string;
-  issue_summary: string;
-  plain_english_impact: string;
-  status: 'HIGH_RISK' | 'CAUTION' | 'SAFE';
+  clause_id?: string;
+  category: string;
+  title?: string;
+  flagged_text?: string;
+  issue?: string;
+  mta_position?: string;
+  verdict: 'PREDATORY' | 'CAUTION' | 'ACCEPTABLE' | 'SAFE';
+  tenant_impact?: string;
+  recommended_action?: string;
+  // fallback
+  [key: string]: unknown;
 }
 
 export interface LeaseAuditResult {
   success: boolean;
-  filename: string;
-  metadata: Record<string, unknown>;
+  filename?: string;
+  metadata?: Record<string, unknown>;
   audit: {
     safety_score: number;
     verdict: string;
-    verdict_color: 'emerald' | 'amber' | 'rose';
+    verdict_color: string;
     verdict_summary: string;
-    metrics: Record<string, unknown>;
+    total_clauses_analyzed?: number;
+    predatory_count?: number;
+    caution_count?: number;
     audited_clauses: AuditedClause[];
+    [key: string]: unknown;
   };
 }
 
-export interface SampleLease {
+export interface SampleAgreement {
   id: string;
-  name: string;
+  title: string;
   description: string;
+  text: string;
+}
+
+// ─── TrueCost ─────────────────────────────────────────────────────────────────
+export interface TrueCostInput {
+  property_name: string;
+  city: string;
+  corridor_key: string;
+  bhk_type: string;
+  base_rent_inr: number;
+  security_deposit_inr: number;
+  society_maintenance_inr: number;
+  parking_fee_inr: number;
+  one_time_brokerage_inr: number;
+  tenure_months: number;
+  daily_commute_km_one_way: number;
+  daily_travel_cost_inr: number;
+  one_way_commute_minutes: number;
 }

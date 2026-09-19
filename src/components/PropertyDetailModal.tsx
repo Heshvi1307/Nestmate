@@ -1,28 +1,46 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  X, MapPin, Star, Shield, BedDouble, Bath, Maximize,
-  Wifi, CheckCircle, Calendar, IndianRupee,
+  X, MapPin, BedDouble, Bath, Maximize,
+  Wifi, CheckCircle, IndianRupee, Calculator,
 } from 'lucide-react';
 import type { Property } from '../types';
 
 interface Props {
   property: Property | null;
   onClose: () => void;
+  onCalculate?: (p: Property) => void;
 }
 
-export const PropertyDetailModal: React.FC<Props> = ({ property, onClose }) => {
+function getPropertyImage(property: Property): string {
+  const seed = property.id?.slice(0, 8) ?? 'home';
+  return `https://picsum.photos/seed/${seed}/800/400`;
+}
+
+export const PropertyDetailModal: React.FC<Props> = ({ property, onClose, onCalculate }) => {
+  const [imgError, setImgError] = useState(false);
   if (!property) return null;
 
-  const img = property.images?.[0]
-    ?? `https://source.unsplash.com/800x500/?apartment,${encodeURIComponent(property.city)}`;
+  const img = imgError
+    ? `https://picsum.photos/seed/fallback/800/400`
+    : getPropertyImage(property);
+
+  const beds = property.bedrooms ?? (() => {
+    const m = property.title?.match(/(\d+)\s*BHK/i);
+    return m ? parseInt(m[1]) : null;
+  })();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
         {/* Hero */}
-        <div className="relative h-64">
-          <img src={img} alt={property.title} className="w-full h-full object-cover rounded-t-3xl" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-t-3xl" />
+        <div className="relative h-56 sm:h-72">
+          <img
+            src={img}
+            alt={property.title}
+            onError={() => setImgError(true)}
+            className="w-full h-full object-cover rounded-t-3xl"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent rounded-t-3xl" />
           <button
             onClick={onClose}
             className="absolute top-4 right-4 bg-white/20 backdrop-blur text-white rounded-full p-2 hover:bg-white/40 transition"
@@ -30,43 +48,32 @@ export const PropertyDetailModal: React.FC<Props> = ({ property, onClose }) => {
             <X className="w-5 h-5" />
           </button>
           <div className="absolute bottom-4 left-4">
-            <p className="text-white font-black text-2xl">₹{property.base_rent.toLocaleString('en-IN')}<span className="text-base font-medium">/mo</span></p>
+            <div className="flex items-baseline gap-1">
+              <IndianRupee className="w-5 h-5 text-white" />
+              <span className="text-white font-black text-3xl">{(property.base_rent ?? 0).toLocaleString('en-IN')}</span>
+              <span className="text-white/80 text-base font-medium">/mo</span>
+            </div>
           </div>
         </div>
 
         <div className="p-6 space-y-5">
-          {/* Title + badges */}
+          {/* Title + location */}
           <div>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {property.verified && (
-                <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 text-xs font-semibold px-2 py-0.5 rounded-full">
-                  <Shield className="w-3 h-3" /> Verified
-                </span>
-              )}
-              {property.verified_owner && (
-                <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded-full">
-                  <CheckCircle className="w-3 h-3" /> Verified Owner
-                </span>
-              )}
-              {property.recently_inspected && (
-                <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-0.5 rounded-full">
-                  <CheckCircle className="w-3 h-3" /> Inspected
-                </span>
-              )}
-            </div>
-            <h2 className="text-xl font-bold text-slate-800">{property.title}</h2>
-            <p className="text-slate-500 text-sm">{property.tagline}</p>
-            <div className="flex items-center gap-1 mt-1 text-slate-500 text-sm">
-              <MapPin className="w-4 h-4" /> {property.neighborhood}, {property.city}
-            </div>
+            <h2 className="text-xl font-bold text-slate-800 leading-snug">{property.title}</h2>
+            {(property.neighborhood || property.city) && (
+              <div className="flex items-center gap-1 mt-1 text-slate-500 text-sm">
+                <MapPin className="w-4 h-4 text-indigo-400" />
+                {property.neighborhood}{property.city ? `, ${property.city}` : ''}
+              </div>
+            )}
           </div>
 
-          {/* Stats */}
+          {/* Quick stats */}
           <div className="grid grid-cols-3 gap-3">
             {[
-              { icon: BedDouble, label: 'Bedrooms', val: property.bedrooms },
-              { icon: Bath, label: 'Bathrooms', val: property.bathrooms },
-              { icon: Maximize, label: 'Area (sqft)', val: property.carpet_area },
+              { icon: BedDouble, label: 'Bedrooms',  val: beds ?? '–' },
+              { icon: Bath,      label: 'Bathrooms', val: property.bathrooms ?? '–' },
+              { icon: Maximize,  label: 'sqft',      val: property.carpet_area ?? '–' },
             ].map(({ icon: Icon, label, val }) => (
               <div key={label} className="bg-slate-50 rounded-xl p-3 text-center">
                 <Icon className="w-5 h-5 text-indigo-500 mx-auto mb-1" />
@@ -76,21 +83,29 @@ export const PropertyDetailModal: React.FC<Props> = ({ property, onClose }) => {
             ))}
           </div>
 
-          {/* Costs */}
+          {/* Furnishing */}
+          <div className="flex flex-wrap gap-2">
+            {property.furnishing && (
+              <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-sm font-medium px-3 py-1 rounded-full">
+                <CheckCircle className="w-3.5 h-3.5" /> {property.furnishing}
+              </span>
+            )}
+          </div>
+
+          {/* Cost breakdown */}
           <div className="bg-indigo-50 rounded-2xl p-4 space-y-2">
-            <h3 className="font-semibold text-indigo-800 flex items-center gap-2"><IndianRupee className="w-4 h-4" /> Cost Breakdown</h3>
+            <h3 className="font-semibold text-indigo-800 flex items-center gap-2">
+              <IndianRupee className="w-4 h-4" /> Cost Breakdown
+            </h3>
             {[
-              ['Base Rent', property.base_rent],
-              ['Utilities', property.utilities_estimate],
-              ['Maintenance', property.maintenance_monthly],
-              ['Internet', property.internet_monthly],
-              ['Total Monthly', property.total_estimated_monthly],
-              ['Deposit', property.deposit],
-              ['Move-in Total', property.move_in_total_cost],
-            ].map(([label, val]) => (
+              ['Base Rent',       property.base_rent],
+              ['Deposit',         property.deposit],
+              ['Utilities Est.',  property.utilities_estimate],
+              ['Total Monthly',   property.total_estimated_monthly],
+            ].filter(([, v]) => v != null).map(([label, val]) => (
               <div key={label as string} className="flex justify-between text-sm">
                 <span className="text-slate-600">{label}</span>
-                <span className={`font-semibold ${label === 'Total Monthly' || label === 'Move-in Total' ? 'text-indigo-700' : 'text-slate-800'}`}>
+                <span className={`font-semibold ${label === 'Total Monthly' ? 'text-indigo-700' : 'text-slate-800'}`}>
                   ₹{(val as number).toLocaleString('en-IN')}
                 </span>
               </div>
@@ -98,44 +113,36 @@ export const PropertyDetailModal: React.FC<Props> = ({ property, onClose }) => {
           </div>
 
           {/* Amenities */}
-          {property.amenities?.length > 0 && (
+          {property.amenities && property.amenities.length > 0 && (
             <div>
-              <h3 className="font-semibold text-slate-700 mb-2 flex items-center gap-2"><Wifi className="w-4 h-4" /> Amenities</h3>
+              <h3 className="font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                <Wifi className="w-4 h-4" /> Amenities
+              </h3>
               <div className="flex flex-wrap gap-2">
-                {property.amenities.map((a) => (
+                {property.amenities.map(a => (
                   <span key={a} className="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">{a}</span>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Rating + available from */}
-          <div className="flex items-center justify-between text-sm text-slate-600 pt-2 border-t border-slate-100">
-            <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span className="font-semibold">{property.rating?.toFixed(1)}</span>
-              <span className="text-slate-400">({property.reviews_count} reviews)</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Calendar className="w-4 h-4 text-emerald-500" />
-              <span>Available: {property.available_from}</span>
-            </div>
+          {/* Actions */}
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={onClose}
+              className="flex-1 py-3 rounded-full border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition"
+            >
+              Close
+            </button>
+            {onCalculate && (
+              <button
+                onClick={() => onCalculate(property)}
+                className="flex-1 py-3 rounded-full bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition flex items-center justify-center gap-2"
+              >
+                <Calculator className="w-4 h-4" /> True Cost
+              </button>
+            )}
           </div>
-
-          {/* Distances */}
-          {property.distances && (
-            <div>
-              <h3 className="font-semibold text-slate-700 mb-2">Commute Times</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {Object.entries(property.distances).map(([key, val]) => (
-                  <div key={key} className="bg-slate-50 rounded-xl p-2 text-center">
-                    <p className="font-bold text-slate-800">{val} min</p>
-                    <p className="text-xs text-slate-500 capitalize">{key.replace('Minutes', '')}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

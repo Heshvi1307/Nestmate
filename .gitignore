@@ -10,6 +10,11 @@ dist-ssr/
 .env.local
 .env.*.local
 
+# Scratch scripts
+check_tables.py
+fix_rls.py
+inspect_data.py
+
 # Logs
 *.log
 npm-debug.log*

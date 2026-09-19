@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Users, FileText, TrendingUp } from 'lucide-react';
+import { Home, Users, TrendingUp, MapPin } from 'lucide-react';
 import type { Property } from '../types';
 
 interface Props {
@@ -8,19 +8,15 @@ interface Props {
 }
 
 export const Dashboard: React.FC<Props> = ({ properties, loading }) => {
-  const verified = properties.filter((p) => p.verified).length;
   const avgRent = properties.length
-    ? Math.round(properties.reduce((s, p) => s + p.base_rent, 0) / properties.length)
+    ? Math.round(properties.reduce((s, p) => s + (p.base_rent ?? 0), 0) / properties.length)
     : 0;
-  const avgRating = properties.length
-    ? (properties.reduce((s, p) => s + (p.rating ?? 0), 0) / properties.length).toFixed(1)
-    : '–';
 
   const stats = [
-    { icon: Home, color: 'indigo', label: 'Total Properties', value: loading ? '…' : properties.length.toLocaleString() },
-    { icon: Users, color: 'emerald', label: 'Verified Listings', value: loading ? '…' : verified.toLocaleString() },
-    { icon: TrendingUp, color: 'amber', label: 'Avg Monthly Rent', value: loading ? '…' : `₹${avgRent.toLocaleString('en-IN')}` },
-    { icon: FileText, color: 'purple', label: 'Avg Rating', value: loading ? '…' : `${avgRating} ★` },
+    { icon: Home,      color: 'indigo',  label: 'Total Properties',   value: loading ? '…' : properties.length.toLocaleString() },
+    { icon: Users,     color: 'emerald', label: 'Roommate Profiles',  value: loading ? '…' : '100' },
+    { icon: TrendingUp,color: 'amber',   label: 'Avg Monthly Rent',   value: loading ? '…' : `₹${avgRent.toLocaleString('en-IN')}` },
+    { icon: MapPin,    color: 'purple',  label: 'Cities Covered',     value: loading ? '…' : `${new Set(properties.map(p => p.city)).size}` },
   ];
 
   return (
@@ -45,11 +41,11 @@ export const Dashboard: React.FC<Props> = ({ properties, loading }) => {
       {/* Top cities */}
       {!loading && properties.length > 0 && (
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-          <h3 className="font-bold text-slate-700 mb-3">Top Cities</h3>
+          <h3 className="font-bold text-slate-700 mb-3">Top Cities by Listings</h3>
           <div className="space-y-2">
             {Object.entries(
               properties.reduce<Record<string, number>>((acc, p) => {
-                acc[p.city] = (acc[p.city] ?? 0) + 1;
+                if (p.city) acc[p.city] = (acc[p.city] ?? 0) + 1;
                 return acc;
               }, {})
             )
@@ -57,7 +53,7 @@ export const Dashboard: React.FC<Props> = ({ properties, loading }) => {
               .slice(0, 8)
               .map(([city, count]) => (
                 <div key={city} className="flex items-center gap-3">
-                  <span className="text-sm text-slate-700 w-32 truncate font-medium">{city}</span>
+                  <span className="text-sm text-slate-700 w-36 truncate font-medium">{city}</span>
                   <div className="flex-1 bg-slate-100 rounded-full h-2">
                     <div
                       className="bg-indigo-500 h-2 rounded-full transition-all"
@@ -65,6 +61,28 @@ export const Dashboard: React.FC<Props> = ({ properties, loading }) => {
                     />
                   </div>
                   <span className="text-xs text-slate-500 w-10 text-right">{count}</span>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
+      {/* Property types breakdown */}
+      {!loading && properties.length > 0 && (
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+          <h3 className="font-bold text-slate-700 mb-3">Property Types</h3>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(
+              properties.reduce<Record<string, number>>((acc, p) => {
+                if (p.property_type) acc[p.property_type] = (acc[p.property_type] ?? 0) + 1;
+                return acc;
+              }, {})
+            )
+              .sort(([, a], [, b]) => b - a)
+              .map(([type, count]) => (
+                <div key={type} className="bg-indigo-50 rounded-full px-3 py-1.5 text-sm">
+                  <span className="font-semibold text-indigo-700">{type}</span>
+                  <span className="text-indigo-400 ml-1">({count})</span>
                 </div>
               ))}
           </div>

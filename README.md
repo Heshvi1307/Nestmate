@@ -17,6 +17,17 @@ A full-stack PropTech web application that makes renting transparent, safe, and 
 
 ---
 
+## 👩‍💻 Core Database Contribution — Heshvi
+
+> **Primary Contribution by Heshvi (Database Architect & Engineer)**
+> - Designed and deployed the complete PostgreSQL schema on Supabase.
+> - Processed and imported **7,691 property listings** across major Indian metro cities.
+> - Structured **100 roommate profiles** with personality vectors, interests, and professional backgrounds.
+> - Standardized **10 legal lease clauses** mapped to the Model Tenancy Act (MTA) 2021.
+> - Configured Row Level Security (RLS) policies and REST API integration endpoints.
+
+---
+
 ## ✨ Features
 
 | Feature | Description |
