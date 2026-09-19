@@ -9,23 +9,23 @@ import {
   SlidersHorizontal, 
   List, 
   Map as MapIcon, 
-  RotateCcw,
-  CheckCircle2,
-  Scale,
-  Wrench,
-  Calculator,
-  Loader2
+  Scale, 
+  Zap, 
+  Building, 
+  CheckCircle2, 
+  Wrench, 
+  Calculator, 
+  ArrowRight
 } from 'lucide-react';
-import { Property, UserRole, NotificationItem, RoommateProfile } from './types';
-import { MOCK_NOTIFICATIONS } from './data/mockData';
-import { useProperties } from './hooks/useProperties';
+import { Property, UserRole } from './types';
+import { NestMateProvider, useNestMate } from './context/NestMateContext';
 
-// Layout & Navigation
+// Navigation & Layout
 import { Navbar as PortalNavbar } from './components/PortalNavbar';
 import { HeroSection } from './components/HeroSection';
 import { Footer } from './components/Footer';
 
-// Explore & Listings Components
+// Explore & Listings
 import { PropertyCard } from './components/PropertyCard';
 import { InteractiveMap } from './components/InteractiveMap';
 import { AISmartSearchBar } from './components/AISmartSearchBar';
@@ -33,80 +33,81 @@ import { SmartSearchFilterDrawer, FilterState, DEFAULT_FILTERS } from './compone
 import { PropertyDetailModal } from './components/PropertyDetailModal';
 import { PropertyComparisonModal } from './components/PropertyComparisonModal';
 
-// AI Engines & Core Pillars
+// AI Pillars & Interactive Engines
 import { FairLeaseGuard } from './components/FairLeaseGuard';
 import { LeaseLens } from './components/LeaseLens';
 import { RoommateMatching } from './components/RoommateMatching';
+import { HarmonyMatch } from './components/HarmonyMatch';
 import { SnapFixTriage } from './components/SnapFixTriage';
+import { MaintenanceHub } from './components/MaintenanceHub';
 import { TrueCostCalculator } from './components/TrueCostCalculator';
 
-// Dashboards & Portals
-import { Dashboard as SupabaseLiveDashboard } from './components/Dashboard';
+// Dashboards & Trust Center
 import { TenantDashboard } from './components/TenantDashboard';
 import { LandlordDashboard } from './components/LandlordDashboard';
 import { PropertyManagerDashboard } from './components/PropertyManagerDashboard';
 import { TrustCenter } from './components/TrustCenter';
 import { AIAssistantModal } from './components/AIAssistantModal';
 
-export const App: React.FC = () => {
-  // Navigation & Role State
-  const [currentTab, setCurrentTab] = useState<string>('explore');
-  const [userRole, setUserRole] = useState<UserRole>('tenant');
-  const [leaseGuardSubTab, setLeaseGuardSubTab] = useState<'analyzer' | 'benchmarks'>('analyzer');
+// Pitch & Action Modals
+import { LandingPage } from './components/LandingPage';
+import { OnboardingModal } from './components/OnboardingModal';
+import { AffordabilityCalculatorModal } from './components/AffordabilityCalculatorModal';
+import { AddPropertyWizardModal } from './components/AddPropertyWizardModal';
+import { RentPaymentModal } from './components/RentPaymentModal';
 
-  // Supabase Properties Hook
-  const { properties, loading: propertiesLoading } = useProperties();
-  const [savedPropertyIds, setSavedPropertyIds] = useState<string[]>(['prop-1']);
-  const [compareProperties, setCompareProperties] = useState<Property[]>([]);
-  
-  // Interactive Hover & Selection
-  const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(null);
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+function NestMateMainContent() {
+  const {
+    user,
+    userRole,
+    setUserRole,
+    currentTab,
+    setCurrentTab,
+    showLandingPage,
+    setShowLandingPage,
+    showOnboardingModal,
+    setShowOnboardingModal,
+    loginAsDemoTenant,
+    loginAsDemoLandlord,
+    properties,
+    savedPropertyIds,
+    toggleSaveProperty,
+    compareProperties,
+    toggleCompareProperty,
+    clearCompare,
+    selectedProperty,
+    setSelectedProperty,
+    hoveredPropertyId,
+    setHoveredPropertyId,
+    isFilterDrawerOpen,
+    setIsFilterDrawerOpen,
+    isCompareModalOpen,
+    setIsCompareModalOpen,
+    isAIAssistantOpen,
+    setIsAIAssistantOpen,
+    isAddPropertyWizardOpen,
+    setIsAddPropertyWizardOpen,
+    isAffordabilityModalOpen,
+    setIsAffordabilityModalOpen,
+    affordabilityProperty,
+    openAffordabilityCalculator,
+    showReceiptModal,
+    setShowReceiptModal,
+    handlePayRent,
+    notifications,
+    markNotificationRead
+  } = useNestMate();
 
-  // Modals & Drawers
-  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
-  const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
-
-  // Filters State
+  // Local Filters State for Explore Tab
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [searchLocation, setSearchLocation] = useState<string>('All Ahmedabad');
   const [sortBy, setSortBy] = useState<'recommended' | 'trueCostAsc' | 'priceAsc' | 'inspectionDesc'>('recommended');
-
-  // Mobile Map/List View Toggle
   const [mobileViewMode, setMobileViewMode] = useState<'list' | 'map'>('list');
 
-  // Notifications State
-  const [notifications, setNotifications] = useState<NotificationItem[]>(MOCK_NOTIFICATIONS);
-
-  // Toggle Save / Wishlist
-  const handleToggleSave = (id: string, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (savedPropertyIds.includes(id)) {
-      setSavedPropertyIds(savedPropertyIds.filter(item => item !== id));
-    } else {
-      setSavedPropertyIds([...savedPropertyIds, id]);
-    }
-  };
-
-  // Toggle Compare (Max 3)
-  const handleToggleCompare = (property: Property, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    const exists = compareProperties.some(p => p.id === property.id);
-    if (exists) {
-      setCompareProperties(compareProperties.filter(p => p.id !== property.id));
-    } else {
-      if (compareProperties.length < 3) {
-        setCompareProperties([...compareProperties, property]);
-      } else {
-        alert('You can compare up to 3 properties at a time.');
-      }
-    }
-  };
-
-  const handleMarkNotificationRead = (id: string) => {
-    setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
-  };
+  // Sub-tabs for AI Pillars
+  const [leaseSubTab, setLeaseSubTab] = useState<'analyzer' | 'benchmarks'>('analyzer');
+  const [roommateSubTab, setRoommateSubTab] = useState<'profiles' | 'harmony'>('profiles');
+  const [snapfixSubTab, setSnapfixSubTab] = useState<'ai_triage' | 'hub'>('ai_triage');
 
   // Filter application from Hero
   const handleHeroSearch = (params: { location: string; moveIn: string; budget: string; type: string }) => {
@@ -118,113 +119,89 @@ export const App: React.FC = () => {
     } else if (params.budget === '₹25,000 - ₹35,000') {
       setFilters(prev => ({ ...prev, budgetMax: 35000 }));
     }
-
-    if (params.type !== 'All Types') {
-      setFilters(prev => ({ ...prev, propertyTypes: [params.type] }));
-    }
-
-    const element = document.getElementById('explore-listings');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
   };
 
-  // Natural Language AI Filter Parser
-  const handleApplyAITokens = (tokens: Array<{ category: string; value: string }>) => {
-    const newFilters = { ...DEFAULT_FILTERS };
-
-    tokens.forEach(t => {
-      if (t.category === 'Budget') {
-        if (t.value.includes('20,000')) newFilters.budgetMax = 20000;
-        if (t.value.includes('25,000')) newFilters.budgetMax = 25000;
-        if (t.value.includes('18,000')) newFilters.budgetMax = 18000;
-      }
-      if (t.category === 'Type') {
-        if (t.value.includes('1 BHK')) newFilters.propertyTypes.push('1 BHK');
-        if (t.value.includes('2 BHK')) newFilters.propertyTypes.push('2 BHK');
-        if (t.value.includes('Studio')) newFilters.propertyTypes.push('Studio', 'Co-living Suite');
-      }
-      if (t.category === 'Furnishing') {
-        newFilters.furnishing.push('Fully Furnished');
-      }
-      if (t.category === 'Commute') {
-        newFilters.maxCommuteUniversity = 20;
-      }
-      if (t.category === 'Amenity') {
-        if (t.value.includes('Parking')) newFilters.parking = true;
-        if (t.value.includes('Power Backup')) newFilters.powerBackup = true;
-      }
-    });
-
-    setFilters(newFilters);
-  };
-
-  // Filtered & Sorted Properties List
+  // Filtered properties
   const filteredProperties = useMemo(() => {
-    return properties
-      .filter(p => {
-        // Location Filter
-        if (searchLocation !== 'All Ahmedabad' && p.city && !p.city.toLowerCase().includes(searchLocation.toLowerCase()) && !p.neighborhood.toLowerCase().includes(searchLocation.toLowerCase())) {
-          return false;
-        }
-
-        // Budget Filter
-        const rent = p.baseRent ?? p.base_rent ?? 0;
-        if (rent > filters.budgetMax) return false;
-
-        // Property Type Filter
-        const pType = p.propertyType || p.property_type || '';
-        if (filters.propertyTypes.length > 0 && !filters.propertyTypes.some(t => pType.includes(t))) {
-          return false;
-        }
-
-        // Bedroom count filter
-        if (filters.bedrooms.length > 0 && p.bedrooms && !filters.bedrooms.includes(p.bedrooms)) {
-          return false;
-        }
-
-        // Furnishing Filter
-        if (filters.furnishing.length > 0 && p.furnishing && !filters.furnishing.includes(p.furnishing)) {
-          return false;
-        }
-
-        return true;
-      })
-      .sort((a, b) => {
-        const aRent = a.baseRent ?? a.base_rent ?? 0;
-        const bRent = b.baseRent ?? b.base_rent ?? 0;
-        const aTotal = a.totalEstimatedMonthly ?? a.total_estimated_monthly ?? aRent;
-        const bTotal = b.totalEstimatedMonthly ?? b.total_estimated_monthly ?? bRent;
-
-        if (sortBy === 'priceAsc') return aRent - bRent;
-        if (sortBy === 'trueCostAsc') return aTotal - bTotal;
-        if (sortBy === 'inspectionDesc') {
-          return (b.transparencyDetails?.inspectionScore || 90) - (a.transparencyDetails?.inspectionScore || 90);
-        }
-        return (b.rating || 4.5) - (a.rating || 4.5);
-      });
-  }, [properties, filters, searchLocation, sortBy]);
+    return properties.filter((prop) => {
+      if (searchLocation !== 'All Ahmedabad' && searchLocation !== 'All Ahmedabad & GIFT') {
+        const matchLoc = 
+          prop.neighborhood.toLowerCase().includes(searchLocation.toLowerCase()) ||
+          prop.city.toLowerCase().includes(searchLocation.toLowerCase());
+        if (!matchLoc) return false;
+      }
+      if (prop.baseRent > filters.budgetMax) return false;
+      if (filters.depositMax && prop.deposit > filters.depositMax) return false;
+      if (filters.propertyTypes.length > 0 && !filters.propertyTypes.includes(prop.propertyType)) return false;
+      if (filters.bedrooms.length > 0 && !filters.bedrooms.includes(prop.bedrooms)) return false;
+      if (filters.furnishing.length > 0 && !filters.furnishing.includes(prop.furnishing)) return false;
+      if (filters.parking && !prop.amenities.some(a => a.toLowerCase().includes('parking'))) return false;
+      if (filters.wifi && !prop.amenities.some(a => a.toLowerCase().includes('wi-fi') || a.toLowerCase().includes('wifi') || a.toLowerCase().includes('internet'))) return false;
+      if (filters.powerBackup && !prop.amenities.some(a => a.toLowerCase().includes('power backup') || a.toLowerCase().includes('backup'))) return false;
+      if (filters.ac && !prop.amenities.some(a => a.toLowerCase().includes('ac') || a.toLowerCase().includes('air conditioning'))) return false;
+      return true;
+    }).sort((a, b) => {
+      if (sortBy === 'trueCostAsc') return a.totalEstimatedMonthly - b.totalEstimatedMonthly;
+      if (sortBy === 'priceAsc') return a.baseRent - b.baseRent;
+      if (sortBy === 'inspectionDesc') return b.transparencyDetails.inspectionScore - a.transparencyDetails.inspectionScore;
+      return b.rating - a.rating;
+    });
+  }, [properties, searchLocation, filters, sortBy]);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
-    if (filters.budgetMax < 50000) count++;
+    if (filters.budgetMax !== DEFAULT_FILTERS.budgetMax) count++;
+    if (filters.depositMax !== DEFAULT_FILTERS.depositMax) count++;
     if (filters.propertyTypes.length > 0) count += filters.propertyTypes.length;
     if (filters.bedrooms.length > 0) count += filters.bedrooms.length;
     if (filters.furnishing.length > 0) count += filters.furnishing.length;
     if (filters.parking) count++;
-    if (filters.powerBackup) count++;
     if (filters.wifi) count++;
+    if (filters.powerBackup) count++;
+    if (filters.ac) count++;
+    if (filters.petFriendly) count++;
     return count;
   }, [filters]);
 
-  const handleAskNoraAboutProperty = (prop: Property) => {
-    setSelectedProperty(null);
-    setIsAIAssistantOpen(true);
-  };
+  // If Marketing Pitch / Landing Page is active, render full-page Landing Page
+  if (showLandingPage) {
+    return (
+      <div className="min-h-screen bg-[#F7F7F4] text-text-primary">
+        <LandingPage
+          onOpenAuth={() => setShowOnboardingModal(true)}
+          onExploreSpaces={() => setShowLandingPage(false)}
+          onFindMatch={() => {
+            setShowLandingPage(false);
+            setCurrentTab('harmony-match');
+          }}
+        />
+
+        {/* Global Modals on Landing Page */}
+        <OnboardingModal
+          isOpen={showOnboardingModal}
+          onClose={() => setShowOnboardingModal(false)}
+        />
+        <AIAssistantModal
+          isOpen={isAIAssistantOpen}
+          onClose={() => setIsAIAssistantOpen(false)}
+          onNavigateToTab={(tab) => {
+            setShowLandingPage(false);
+            setCurrentTab(tab);
+          }}
+          onSelectProperty={(p) => {
+            setShowLandingPage(false);
+            setSelectedProperty(p);
+          }}
+          properties={properties}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-[#F7F7F4] flex flex-col font-sans text-text-primary selection:bg-primary selection:text-white">
-      {/* Top Universal Navbar */}
+    <div className="min-h-screen flex flex-col bg-background text-text-primary antialiased selection:bg-primary selection:text-white">
+      
+      {/* Unified Top Navigation */}
       <PortalNavbar
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
@@ -235,71 +212,62 @@ export const App: React.FC = () => {
         onOpenCompare={() => setIsCompareModalOpen(true)}
         onOpenAIAssistant={() => setIsAIAssistantOpen(true)}
         notifications={notifications}
-        onMarkNotificationRead={handleMarkNotificationRead}
+        onMarkNotificationRead={markNotificationRead}
+        onOpenLandingPage={() => setShowLandingPage(true)}
+        onOpenOnboarding={() => setShowOnboardingModal(true)}
       />
 
-      {/* Main Tab Routing */}
-      <main className="flex-1">
-        {/* TAB 1: EXPLORE (Listings + Interactive Vector Map) */}
+      <main className="flex-1 pb-16">
+        
+        {/* ==================================================
+            TAB 1: EXPLORE & PROPERTIES
+            ================================================== */}
         {currentTab === 'explore' && (
-          <div className="space-y-6">
-            {/* Hero Section */}
+          <div className="space-y-8">
             <HeroSection
               onSearch={handleHeroSearch}
               onOpenRoommates={() => setCurrentTab('harmony-match')}
               onOpenLeaseLens={() => setCurrentTab('lease-guard')}
-              onOpenAISearch={() => {
-                const element = document.getElementById('ai-search-bar');
-                if (element) element.scrollIntoView({ behavior: 'smooth' });
-              }}
+              onOpenAISearch={() => setIsAIAssistantOpen(true)}
+              onOpenMyHome={() => setCurrentTab('dashboard')}
             />
 
-            {/* AI Natural Language Search Bar */}
-            <div id="ai-search-bar" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+              {/* Natural Language AI Search Bar */}
               <AISmartSearchBar
-                onApplyParsedFilter={handleApplyAITokens}
+                onApplyParsedFilter={(tokens) => {
+                  tokens.forEach((t) => {
+                    if (t.category === 'Budget') {
+                      const num = parseInt(t.value.replace(/[^0-9]/g, ''));
+                      if (num) setFilters(prev => ({ ...prev, budgetMax: num }));
+                    }
+                  });
+                }}
                 onClear={() => setFilters(DEFAULT_FILTERS)}
               />
-            </div>
 
-            {/* Explore Section Bar */}
-            <section id="explore-listings" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-2">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-4">
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <h2 className="text-2xl font-extrabold text-text-primary tracking-tight">
-                      Available Verified Homes
-                    </h2>
-                    {propertiesLoading ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary-light text-primary">
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                        Fetching Database...
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary-light text-primary">
-                        {filteredProperties.length} verified listings
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-text-muted mt-1">
-                    Live Supabase database listings · All-in TrueCost pricing with zero deceptive charges
-                  </p>
+              {/* Action Bar: Count, Sort, Filter Drawer */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm font-bold text-text-primary">
+                    {filteredProperties.length} verified spaces available
+                  </span>
+                  {searchLocation !== 'All Ahmedabad' && (
+                    <span className="text-xs px-2 py-0.5 rounded-md bg-surface border border-border text-text-muted">
+                      in {searchLocation}
+                    </span>
+                  )}
                 </div>
 
-                {/* Filter and View Toggles */}
-                <div className="flex items-center flex-wrap gap-2">
+                <div className="flex items-center space-x-2">
                   <button
                     onClick={() => setIsFilterDrawerOpen(true)}
-                    className={`inline-flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all ${
-                      activeFilterCount > 0
-                        ? 'bg-primary text-white border-primary shadow-subtle'
-                        : 'bg-surface text-text-primary border-border hover:border-primary/40'
-                    }`}
+                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-border bg-surface hover:bg-surfaceMuted text-xs font-semibold text-text-primary transition-all shadow-subtle"
                   >
-                    <SlidersHorizontal className="w-3.5 h-3.5" />
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-primary" />
                     <span>Filters</span>
                     {activeFilterCount > 0 && (
-                      <span className="w-4 h-4 rounded-full bg-white text-primary text-[10px] font-black flex items-center justify-center">
+                      <span className="w-4 h-4 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">
                         {activeFilterCount}
                       </span>
                     )}
@@ -307,248 +275,411 @@ export const App: React.FC = () => {
 
                   <select
                     value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as any)}
-                    className="px-3 py-2 rounded-xl text-xs font-semibold bg-surface border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                    onChange={(e: any) => setSortBy(e.target.value)}
+                    className="px-3 py-1.5 rounded-lg border border-border bg-surface text-xs font-semibold text-text-primary focus:outline-none focus:ring-1 focus:ring-primary shadow-subtle"
                   >
-                    <option value="recommended">Highest Trust & Rating</option>
-                    <option value="trueCostAsc">Lowest Total Monthly Cost</option>
-                    <option value="priceAsc">Base Rent: Low to High</option>
+                    <option value="recommended">Sort: Recommended</option>
+                    <option value="trueCostAsc">Lowest TrueCost™</option>
+                    <option value="priceAsc">Lowest Base Rent</option>
                     <option value="inspectionDesc">Highest Inspection Score</option>
                   </select>
 
-                  <div className="flex items-center p-1 bg-surface border border-border rounded-xl">
+                  {/* Mobile Toggle */}
+                  <div className="lg:hidden flex items-center bg-surface border border-border rounded-lg p-0.5">
                     <button
                       onClick={() => setMobileViewMode('list')}
-                      className={`p-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-colors ${
-                        mobileViewMode === 'list'
-                          ? 'bg-primary text-white'
-                          : 'text-text-muted hover:text-text-primary'
-                      }`}
-                      title="Split / List View"
+                      className={`p-1.5 rounded-md ${mobileViewMode === 'list' ? 'bg-primary text-white' : 'text-text-muted'}`}
                     >
                       <List className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setMobileViewMode('map')}
-                      className={`p-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-colors ${
-                        mobileViewMode === 'map'
-                          ? 'bg-primary text-white'
-                          : 'text-text-muted hover:text-text-primary'
-                      }`}
-                      title="Expanded Map View"
+                      className={`p-1.5 rounded-md ${mobileViewMode === 'map' ? 'bg-primary text-white' : 'text-text-muted'}`}
                     >
                       <MapIcon className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
               </div>
-            </section>
 
-            {/* Split Screen Grid & Vector Map Container */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+              {/* Split Layout: Cards Grid (Left) + Interactive Vector Map (Right) */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                
-                {/* Left Listing Cards Grid (7 cols) */}
                 <div className={`lg:col-span-7 space-y-4 ${mobileViewMode === 'map' ? 'hidden lg:block' : 'block'}`}>
-                  {filteredProperties.length === 0 && !propertiesLoading ? (
-                    <div className="p-12 text-center bg-surface rounded-2xl border border-border space-y-3">
-                      <div className="w-12 h-12 rounded-full bg-surfaceMuted flex items-center justify-center mx-auto text-text-muted">
-                        <Compass className="w-6 h-6" />
-                      </div>
-                      <h3 className="font-bold text-base text-text-primary">No matching properties found</h3>
+                  {filteredProperties.length === 0 ? (
+                    <div className="bg-surface rounded-2xl border border-border p-12 text-center space-y-3">
+                      <ShieldCheck className="w-10 h-10 text-text-muted mx-auto" />
+                      <h3 className="font-bold text-text-primary">No matching spaces found</h3>
                       <p className="text-xs text-text-muted max-w-sm mx-auto">
-                        Try relaxing your budget or lifestyle filter requirements.
+                        Try resetting your price or neighborhood filters to explore all verified Ahmedabad listings.
                       </p>
                       <button
-                        onClick={() => setFilters(DEFAULT_FILTERS)}
-                        className="inline-flex items-center space-x-1.5 text-xs font-bold text-primary hover:underline"
+                        onClick={() => {
+                          setFilters(DEFAULT_FILTERS);
+                          setSearchLocation('All Ahmedabad');
+                        }}
+                        className="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-hover transition-colors"
                       >
-                        <RotateCcw className="w-3.5 h-3.5" />
-                        <span>Reset all filters</span>
+                        Reset All Filters
                       </button>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {filteredProperties.map((prop) => (
+                      {filteredProperties.map((property) => (
                         <PropertyCard
-                          key={prop.id}
-                          property={prop}
-                          isHovered={hoveredPropertyId === prop.id}
-                          isSelected={selectedProperty?.id === prop.id}
-                          isSaved={savedPropertyIds.includes(prop.id)}
-                          isInCompare={compareProperties.some(p => p.id === prop.id)}
-                          onHover={setHoveredPropertyId}
-                          onClick={(p) => setSelectedProperty(p)}
-                          onToggleSave={handleToggleSave}
-                          onToggleCompare={handleToggleCompare}
+                          key={property.id}
+                          property={property}
+                          isSelected={selectedProperty?.id === property.id}
+                          isHovered={hoveredPropertyId === property.id}
+                          isSaved={savedPropertyIds.includes(property.id)}
+                          isInCompare={compareProperties.some(p => p.id === property.id)}
+                          onHover={(id) => setHoveredPropertyId(id)}
+                          onClick={(prop) => setSelectedProperty(prop)}
+                          onToggleSave={(id, e) => toggleSaveProperty(id, e)}
+                          onToggleCompare={(prop, e) => toggleCompareProperty(prop, e)}
                         />
                       ))}
                     </div>
                   )}
                 </div>
 
-                {/* Right Interactive Vector Map (5 cols) */}
-                <div className={`lg:col-span-5 sticky top-24 ${mobileViewMode === 'list' ? 'hidden lg:block' : 'block'}`}>
+                <div className={`lg:col-span-5 sticky top-20 ${mobileViewMode === 'list' ? 'hidden lg:block' : 'block'}`}>
                   <InteractiveMap
                     properties={filteredProperties}
-                    hoveredPropertyId={hoveredPropertyId}
                     selectedPropertyId={selectedProperty?.id || null}
+                    hoveredPropertyId={hoveredPropertyId}
                     onSelectProperty={(prop) => setSelectedProperty(prop)}
-                    onHoverProperty={setHoveredPropertyId}
+                    onHoverProperty={(id) => setHoveredPropertyId(id)}
                     onSearchThisArea={() => {}}
                   />
                 </div>
-
               </div>
             </div>
           </div>
         )}
 
-        {/* TAB 2: LEASE GUARD (Pillar 1 - Legal Lease Analyzer & MTA Benchmarks) */}
-        {currentTab === 'lease-guard' && (
-          <div className="space-y-6">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-              <div className="flex items-center justify-center gap-2 mb-6">
+        {/* ==================================================
+            TAB 2: LEASE GUARD (Pillar 1 - Model Tenancy Act AI Engine)
+            ================================================== */}
+        {(currentTab === 'lease-guard' || currentTab === 'leaselens') && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+            {/* Sub-navigation pill toggle */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+              <div>
+                <span className="text-xs font-bold text-primary tracking-wider uppercase">Pillar 1 · Legal Safeguard</span>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
+                  Lease Guard AI & Agreement Intelligence
+                </h1>
+                <p className="text-xs text-text-muted mt-1">
+                  Full compliance audit under Model Tenancy Act 2021, Gujarat Rent Rules, and unfair clause counter-drafting.
+                </p>
+              </div>
+
+              <div className="inline-flex bg-surface border border-border p-1 rounded-xl shadow-subtle self-start sm:self-auto">
                 <button
-                  onClick={() => setLeaseGuardSubTab('analyzer')}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                    leaseGuardSubTab === 'analyzer'
+                  onClick={() => setLeaseSubTab('analyzer')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    leaseSubTab === 'analyzer'
                       ? 'bg-primary text-white shadow-subtle'
-                      : 'bg-surface text-text-secondary border border-border hover:text-text-primary'
+                      : 'text-text-muted hover:text-text-primary'
                   }`}
                 >
-                  FairLeaseGuard AI Engine
+                  AI Agreement Analyzer
                 </button>
                 <button
-                  onClick={() => setLeaseGuardSubTab('benchmarks')}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                    leaseGuardSubTab === 'benchmarks'
+                  onClick={() => setLeaseSubTab('benchmarks')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    leaseSubTab === 'benchmarks'
                       ? 'bg-primary text-white shadow-subtle'
-                      : 'bg-surface text-text-secondary border border-border hover:text-text-primary'
+                      : 'text-text-muted hover:text-text-primary'
                   }`}
                 >
-                  Model Tenancy Act Clauses (Supabase)
+                  Standard Benchmark Clauses
                 </button>
               </div>
             </div>
 
-            {leaseGuardSubTab === 'analyzer' ? (
+            {leaseSubTab === 'analyzer' ? (
               <FairLeaseGuard />
             ) : (
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-                <LeaseLens />
-              </div>
+              <LeaseLens />
             )}
           </div>
         )}
 
-        {/* TAB 3: HARMONY MATCH (Pillar 2 - Roommate Personality & Lifestyle Protocol) */}
-        {currentTab === 'harmony-match' && (
-          <RoommateMatching
-            onOpenMessageWithRoommate={(roommate: RoommateProfile) => {
-              setCurrentTab('dashboard');
-            }}
-          />
-        )}
+        {/* ==================================================
+            TAB 3: ROOMMATES & HARMONYMATCH (Pillar 2)
+            ================================================== */}
+        {(currentTab === 'harmony-match' || currentTab === 'roommates') && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+            {/* Sub-navigation pill toggle */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+              <div>
+                <span className="text-xs font-bold text-primary tracking-wider uppercase">Pillar 2 · Co-Living Intelligence</span>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
+                  Roommate Matching & HarmonyMatch™
+                </h1>
+                <p className="text-xs text-text-muted mt-1">
+                  Connect with verified students and young professionals across Nirma, CEPT, IIM-A, and GIFT City tech corridors.
+                </p>
+              </div>
 
-        {/* TAB 4: SNAPFIX (Pillar 3 - Anti-Fraud Repair Triage & Escrow) */}
-        {currentTab === 'snapfix' && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <SnapFixTriage />
+              <div className="inline-flex bg-surface border border-border p-1 rounded-xl shadow-subtle self-start sm:self-auto">
+                <button
+                  onClick={() => setRoommateSubTab('profiles')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    roommateSubTab === 'profiles'
+                      ? 'bg-primary text-white shadow-subtle'
+                      : 'text-text-muted hover:text-text-primary'
+                  }`}
+                >
+                  Browse Campus Profiles (21)
+                </button>
+                <button
+                  onClick={() => setRoommateSubTab('harmony')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    roommateSubTab === 'harmony'
+                      ? 'bg-primary text-white shadow-subtle'
+                      : 'text-text-muted hover:text-text-primary'
+                  }`}
+                >
+                  AI Vector Matcher & Living Charter
+                </button>
+              </div>
+            </div>
+
+            {roommateSubTab === 'profiles' ? (
+              <RoommateMatching
+                onOpenMessageWithRoommate={() => {
+                  setCurrentTab('dashboard');
+                }}
+              />
+            ) : (
+              <HarmonyMatch />
+            )}
           </div>
         )}
 
-        {/* TAB 5: TRUECOST INDEX (Pillar 4 - Anti-Deception Cost & Deception Calculator) */}
+        {/* ==================================================
+            TAB 4: SNAPFIX (Pillar 3 - Anti-Fraud Repair Triage)
+            ================================================== */}
+        {currentTab === 'snapfix' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+            {/* Sub-navigation pill toggle */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+              <div>
+                <span className="text-xs font-bold text-primary tracking-wider uppercase">Pillar 3 · Operations & Forensic Triage</span>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
+                  SnapFix™ Maintenance & Anti-Fraud Triage
+                </h1>
+                <p className="text-xs text-text-muted mt-1">
+                  Cryptographic photo verification, AI severity assessment, vendor dispatch, and Model Tenancy Act liability assignment.
+                </p>
+              </div>
+
+              <div className="inline-flex bg-surface border border-border p-1 rounded-xl shadow-subtle self-start sm:self-auto">
+                <button
+                  onClick={() => setSnapfixSubTab('ai_triage')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    snapfixSubTab === 'ai_triage'
+                      ? 'bg-primary text-white shadow-subtle'
+                      : 'text-text-muted hover:text-text-primary'
+                  }`}
+                >
+                  AI Forensic Photo Diagnosis
+                </button>
+                <button
+                  onClick={() => setSnapfixSubTab('hub')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    snapfixSubTab === 'hub'
+                      ? 'bg-primary text-white shadow-subtle'
+                      : 'text-text-muted hover:text-text-primary'
+                  }`}
+                >
+                  Live Maintenance Tracker
+                </button>
+              </div>
+            </div>
+
+            {snapfixSubTab === 'ai_triage' ? (
+              <SnapFixTriage />
+            ) : (
+              <MaintenanceHub onOpenMessageWithTechnician={() => setCurrentTab('dashboard')} />
+            )}
+          </div>
+        )}
+
+        {/* ==================================================
+            TAB 5: TRUECOST INDEX (Pillar 4 - Anti-Deception Cost Engine)
+            ================================================== */}
         {currentTab === 'truecost' && (
           <TrueCostCalculator />
         )}
 
-        {/* TAB 6: DASHBOARD (Supabase Live Metrics + Role-Based Portals) */}
+        {/* ==================================================
+            TAB 6: ADAPTIVE DASHBOARDS BASED ON USER ROLE
+            ================================================== */}
         {currentTab === 'dashboard' && (
-          <div className="space-y-8 py-6">
-            {/* Top Live Supabase Database Metrics */}
-            <SupabaseLiveDashboard
-              properties={properties}
-              loading={propertiesLoading}
-            />
-
-            {/* Role-Based Dashboard View */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="border-t border-border pt-6">
-                {userRole === 'tenant' && (
-                  <TenantDashboard
-                    onOpenLeaseLens={() => setCurrentTab('lease-guard')}
-                    onOpenAIAssistant={() => setIsAIAssistantOpen(true)}
-                  />
-                )}
-                {userRole === 'landlord' && (
-                  <LandlordDashboard
-                    onOpenLeaseLens={() => setCurrentTab('lease-guard')}
-                    onOpenMessageWithTenant={() => {}}
-                  />
-                )}
-                {userRole === 'property_manager' && (
-                  <PropertyManagerDashboard onOpenMessages={() => {}} />
-                )}
-              </div>
-            </div>
+          <div className="py-6">
+            {userRole === 'tenant' && (
+              <TenantDashboard
+                onOpenLeaseLens={() => setCurrentTab('lease-guard')}
+                onOpenAIAssistant={() => setIsAIAssistantOpen(true)}
+              />
+            )}
+            {userRole === 'landlord' && (
+              <LandlordDashboard
+                onOpenLeaseLens={() => setCurrentTab('lease-guard')}
+                onOpenMessageWithTenant={() => {
+                  // Message tenant
+                }}
+              />
+            )}
+            {userRole === 'property_manager' && (
+              <PropertyManagerDashboard
+                onOpenMessages={() => {
+                  // Message contractor
+                }}
+              />
+            )}
           </div>
         )}
 
-        {/* TAB 7: TRUST CENTER */}
+        {/* ==================================================
+            TAB 7: TRUST CENTER
+            ================================================== */}
         {currentTab === 'trust' && (
           <TrustCenter />
         )}
+
       </main>
 
-      {/* Global Footer */}
-      <Footer onSelectTab={(tab) => setCurrentTab(tab)} />
+      {/* Floating Compare Tray (When 1+ properties selected) */}
+      {compareProperties.length > 0 && !isCompareModalOpen && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-text-primary text-white px-4 py-2.5 rounded-full shadow-dropdown flex items-center space-x-3 text-xs animate-in slide-in-from-bottom-3 duration-200">
+          <div className="flex items-center space-x-1.5">
+            <Scale className="w-4 h-4 text-secondary" />
+            <span className="font-bold">
+              {compareProperties.length} spaces in comparison
+            </span>
+          </div>
 
-      {/* MODAL 1: Filter Drawer */}
-      <SmartSearchFilterDrawer
-        isOpen={isFilterDrawerOpen}
-        onClose={() => setIsFilterDrawerOpen(false)}
-        filters={filters}
-        onApplyFilters={setFilters}
-        onResetFilters={() => setFilters(DEFAULT_FILTERS)}
-        activeCount={activeFilterCount}
-      />
+          <button
+            onClick={() => setIsCompareModalOpen(true)}
+            className="px-3 py-1 rounded-full bg-primary hover:bg-primary-hover text-white font-extrabold text-[11px] transition-colors"
+          >
+            Compare Now →
+          </button>
 
-      {/* MODAL 2: Property Detail Modal */}
+          <button
+            onClick={clearCompare}
+            className="text-text-muted hover:text-white text-[11px] font-semibold"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+
+      {/* Global Modals */}
+
+      {/* 1. Property Detail Modal */}
       <PropertyDetailModal
         property={selectedProperty}
         onClose={() => setSelectedProperty(null)}
-        onAskNoraAboutProperty={handleAskNoraAboutProperty}
+        onAskNoraAboutProperty={() => {
+          setSelectedProperty(null);
+          setIsAIAssistantOpen(true);
+        }}
         isSaved={selectedProperty ? savedPropertyIds.includes(selectedProperty.id) : false}
-        onToggleSave={handleToggleSave}
+        onToggleSave={(id) => toggleSaveProperty(id)}
+        onOpenAffordabilityCalculator={(prop) => openAffordabilityCalculator(prop)}
+        onToggleCompare={(prop) => toggleCompareProperty(prop)}
+        isInCompare={selectedProperty ? compareProperties.some(p => p.id === selectedProperty.id) : false}
       />
 
-      {/* MODAL 3: Property Comparison Modal */}
+      {/* 2. Property Comparison Modal */}
       <PropertyComparisonModal
         isOpen={isCompareModalOpen}
         onClose={() => setIsCompareModalOpen(false)}
         properties={compareProperties}
-        onRemoveProperty={(id) => setCompareProperties(compareProperties.filter(p => p.id !== id))}
-        onViewDetails={(prop: Property) => {
+        onRemoveProperty={(id) => {
+          const propToRemove = compareProperties.find(p => p.id === id);
+          if (propToRemove) toggleCompareProperty(propToRemove);
+        }}
+        onViewDetails={(p) => {
+          setSelectedProperty(p);
           setIsCompareModalOpen(false);
-          setSelectedProperty(prop);
         }}
       />
 
-      {/* MODAL 4: Nora AI Living Assistant */}
+      {/* 3. Smart Search Filter Drawer */}
+      <SmartSearchFilterDrawer
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        filters={filters}
+        onApplyFilters={(f) => setFilters(f)}
+        onResetFilters={() => setFilters(DEFAULT_FILTERS)}
+        activeCount={activeFilterCount}
+      />
+
+      {/* 4. AI Concierge NORA Modal */}
       <AIAssistantModal
         isOpen={isAIAssistantOpen}
         onClose={() => setIsAIAssistantOpen(false)}
-        onNavigateToTab={(tab) => {
-          setIsAIAssistantOpen(false);
-          setCurrentTab(tab);
-        }}
-        onSelectProperty={(prop) => {
-          setIsAIAssistantOpen(false);
-          setSelectedProperty(prop);
-        }}
+        onNavigateToTab={(tab) => setCurrentTab(tab)}
+        onSelectProperty={(p) => setSelectedProperty(p)}
         properties={properties}
       />
+
+      {/* 5. Onboarding Modal */}
+      <OnboardingModal
+        isOpen={showOnboardingModal}
+        onClose={() => setShowOnboardingModal(false)}
+      />
+
+      {/* 6. Affordability Calculator Modal */}
+      <AffordabilityCalculatorModal
+        isOpen={isAffordabilityModalOpen}
+        onClose={() => setIsAffordabilityModalOpen(false)}
+        property={affordabilityProperty}
+        onAskNora={() => {
+          setIsAffordabilityModalOpen(false);
+          setIsAIAssistantOpen(true);
+        }}
+        onViewComparison={() => {
+          setIsAffordabilityModalOpen(false);
+          setIsCompareModalOpen(true);
+        }}
+      />
+
+      {/* 7. Add Property 7-Step Wizard Modal */}
+      <AddPropertyWizardModal
+        isOpen={isAddPropertyWizardOpen}
+        onClose={() => setIsAddPropertyWizardOpen(false)}
+      />
+
+      {/* 8. Rent Payment Modal */}
+      <RentPaymentModal
+        isOpen={showReceiptModal}
+        onClose={() => setShowReceiptModal(false)}
+        onPaymentSuccess={handlePayRent}
+        amount={24000}
+        unit="Flat 402, The Solitaire Terraces, Vastrapur"
+        landlordName="Vikramaditya Sanghavi"
+      />
+
+      {/* Global Footer */}
+      <Footer onSelectTab={(tab) => setCurrentTab(tab)} />
+
     </div>
   );
-};
+}
+
+export function App() {
+  return (
+    <NestMateProvider>
+      <NestMateMainContent />
+    </NestMateProvider>
+  );
+}
+
+export default App;

@@ -55,7 +55,7 @@ export const MOCK_PROPERTIES: Property[] = [
       depositReturnPolicy: 'Full refund within 7 business days post-moveout inspection.'
     },
     timeline: [
-      { date: '10 Jan 2024', event: 'Property Listed on NESTORA', status: 'completed', notes: 'Initial listing with verified title deed' },
+      { date: '10 Jan 2024', event: 'Property Listed on NestMate', status: 'completed', notes: 'Initial listing with verified title deed' },
       { date: '14 Jan 2024', event: '48-Point Physical Inspection', status: 'completed', notes: 'Passed with 98% score; zero moisture detected' },
       { date: '12 Feb 2026', event: 'Annual Preventive Maintenance', status: 'completed', notes: 'AC gas check, electrical load testing completed' },
       { date: 'Today', event: 'Verified Vacancy Available', status: 'current', notes: 'Ready for move-in from 1st of next month' }
@@ -229,7 +229,7 @@ export const MOCK_PROPERTIES: Property[] = [
       standardLeaseAvailable: true,
       lockInMonths: 6,
       noticePeriodDays: 30,
-      depositReturnPolicy: 'Standard 7-day NESTORA escrow release.'
+      depositReturnPolicy: 'Standard 7-day NestMate escrow release.'
     },
     timeline: [
       { date: '15 Jan 2026', event: 'Physical Assessment', status: 'completed', notes: 'Gas line safety test passed' },
@@ -721,10 +721,10 @@ export const MOCK_LEASE_CLAUSES: LeaseClause[] = [
     title: 'Notice Period After Lock-in',
     section: 'Tenure & Termination',
     category: 'Notice Period',
-    originalText: 'Subsequent to the expiration of the Lock-in Period, either party may terminate this agreement by providing at least 30 (thirty) days prior written notice (via registered email or NESTORA digital portal) without assigning any reason or incurring any penalty.',
+    originalText: 'Subsequent to the expiration of the Lock-in Period, either party may terminate this agreement by providing at least 30 (thirty) days prior written notice (via registered email or NestMate digital portal) without assigning any reason or incurring any penalty.',
     aiExplanation: 'Standard, fair 30-day notice period. Both tenant and landlord have equal rights to end tenancy with 1 month advance notice.',
     riskLevel: 'Safe & Standard',
-    potentialHiddenCost: 'Ensure you serve notice in writing so the 30-day clock is officially recorded in NESTORA timestamp logs.',
+    potentialHiddenCost: 'Ensure you serve notice in writing so the 30-day clock is officially recorded in NestMate timestamp logs.',
     whatToClarify: 'Clarify whether the 30 days can start mid-month with prorated rent or must align with the calendar month cycle.'
   },
   {
@@ -749,7 +749,7 @@ export const MOCK_LEASE_CLAUSES: LeaseClause[] = [
     aiExplanation: 'Eliminates flat-rate electricity markups. You pay actual Torrent Power domestic rates rather than inflated commercial rates charged by unscrupulous landlords.',
     riskLevel: 'Safe & Standard',
     potentialHiddenCost: 'Ensure Torrent Power bills are paid punctually to avoid late surcharges (~₹100/bill).',
-    whatToClarify: 'Verify the sub-meter baseline reading on move-in day and log it inside NESTORA.'
+    whatToClarify: 'Verify the sub-meter baseline reading on move-in day and log it inside NestMate.'
   },
   {
     id: 'clause-restrictions',
@@ -773,7 +773,7 @@ export const MOCK_LEASE_CLAUSES: LeaseClause[] = [
     aiExplanation: 'Standard protection against commercial exploitation or non-payment. If you want to replace a roommate, you must notify the landlord and update the digital agreement.',
     riskLevel: 'Important Caveat',
     potentialHiddenCost: 'Legal liability if unauthorized subletting occurs without written amendment.',
-    whatToClarify: 'When sharing with roommates, use NESTORA co-tenant addendums so each person is held accountable for their share.'
+    whatToClarify: 'When sharing with roommates, use NestMate co-tenant addendums so each person is held accountable for their share.'
   }
 ];
 
@@ -792,7 +792,7 @@ export const MOCK_MAINTENANCE_TICKETS: MaintenanceTicket[] = [
     photoUrl: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80',
     technician: {
       name: 'Rahul Sharma',
-      company: 'Rahul Sanitary & Home Services (Certified NESTORA Partner)',
+      company: 'Rahul Sanitary & Home Services (Certified NestMate Partner)',
       rating: 4.9,
       phone: '+91 98250 44192',
       scheduledTime: 'Today · 4:30 PM',
@@ -801,7 +801,7 @@ export const MOCK_MAINTENANCE_TICKETS: MaintenanceTicket[] = [
     },
     activityTimeline: [
       { time: '09:12 AM', title: 'Issue Reported', description: 'Tenant Het submitted ticket with photo of pipe joint drip.', actor: 'Het (Tenant)', status: 'done' },
-      { time: '09:20 AM', title: 'Property Manager Notified', description: 'Automated triage routed to Vastrapur maintenance zone.', actor: 'NESTORA AI Dispatch', status: 'done' },
+      { time: '09:20 AM', title: 'Property Manager Notified', description: 'Automated triage routed to Vastrapur maintenance zone.', actor: 'NestMate AI Dispatch', status: 'done' },
       { time: '09:35 AM', title: 'Technician Assigned', description: 'Certified plumber Rahul Sharma accepted the job ticket.', actor: 'Rahul Services', status: 'done' },
       { time: '02:15 PM', title: 'Replacement Part Procured', description: 'Heavy-duty 40mm flexible waste trap & silicon seal sourced.', actor: 'Rahul Sharma', status: 'done' },
       { time: '04:15 PM', title: 'Technician In Transit', description: 'En route with toolkit. Estimated arrival 04:30 PM.', actor: 'Rahul Sharma', status: 'active' },
@@ -1008,7 +1008,7 @@ export const MOCK_MESSAGE_THREADS: MessageThread[] = [
     recipientName: 'Aarav Patel',
     recipientRole: 'Potential Roommate (94% Match)',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-    lastMessage: 'Hey Het! Saw our compatibility profile on NESTORA. I also work remote in tech and love Vastrapur area.',
+    lastMessage: 'Hey Het! Saw our compatibility profile on NestMate. I also work remote in tech and love Vastrapur area.',
     timestamp: '2 days ago',
     unreadCount: 0,
     contextType: 'roommate',
@@ -1018,7 +1018,7 @@ export const MOCK_MESSAGE_THREADS: MessageThread[] = [
       id: 'rm-1'
     },
     messages: [
-      { id: 'a1', sender: 'recipient', text: 'Hey Het! Saw our compatibility profile on NESTORA. I also work remote in tech and love Vastrapur area.', timestamp: '2 days ago' },
+      { id: 'a1', sender: 'recipient', text: 'Hey Het! Saw our compatibility profile on NestMate. I also work remote in tech and love Vastrapur area.', timestamp: '2 days ago' },
       { id: 'a2', sender: 'user', text: 'Hey Aarav! Awesome to connect. I was looking at The Solitaire Terraces 2BHK — it has two equal master rooms and high-speed fiber.', timestamp: '2 days ago' }
     ]
   }

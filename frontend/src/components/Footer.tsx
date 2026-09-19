@@ -23,14 +23,14 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab }) => {
                 </svg>
               </div>
               <span className="font-extrabold text-xl tracking-tight text-text-primary">
-                NESTORA
+                NestMate
               </span>
             </div>
 
             <p className="text-sm text-text-secondary leading-relaxed max-w-sm">
-              <strong>“Find a space. Find your people. Live better.”</strong>
+              <strong>“Find your space. Find your people. Live better.”</strong>
               <br />
-              Next-generation real-estate and shared-living intelligence designed for first-time renters, students, young professionals, and modern property owners.
+              NestMate is a next-generation real-estate and shared-living platform connecting tenants and landlords in one transparent digital ecosystem.
             </p>
 
             <div className="flex items-center space-x-3 text-xs text-text-muted">
@@ -113,7 +113,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab }) => {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-text-muted gap-4">
-          <p>© 2026 NESTORA Technologies Pvt. Ltd. All rights reserved.</p>
+          <p>© 2026 NestMate Technologies Pvt. Ltd. All rights reserved.</p>
           <div className="flex items-center space-x-4">
             <span>Ahmedabad, Gujarat, India</span>
             <span>·</span>

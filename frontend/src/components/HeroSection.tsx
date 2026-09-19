@@ -15,31 +15,49 @@ import {
   Clock
 } from 'lucide-react';
 
+import { useNestMate } from '../context/NestMateContext';
+
 interface HeroSectionProps {
   onSearch: (params: { location: string; moveIn: string; budget: string; type: string }) => void;
   onOpenRoommates: () => void;
   onOpenLeaseLens: () => void;
   onOpenAISearch: () => void;
+  onOpenMyHome?: () => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
   onSearch,
   onOpenRoommates,
   onOpenLeaseLens,
-  onOpenAISearch
+  onOpenAISearch,
+  onOpenMyHome
 }) => {
+  const { user, userRole, rentPaid, maintenanceTickets } = useNestMate();
+
   const [location, setLocation] = useState('All Ahmedabad');
   const [moveIn, setMoveIn] = useState('Immediate / 1st Next Month');
   const [budget, setBudget] = useState('Under ₹25,000');
   const [propertyType, setPropertyType] = useState('All Types');
+  const [quickSearchInput, setQuickSearchInput] = useState('');
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch({ location, moveIn, budget, type: propertyType });
+    onSearch({ 
+      location: quickSearchInput || location, 
+      moveIn, 
+      budget, 
+      type: propertyType 
+    });
+  };
+
+  const handleQuickPillClick = (cityName: string) => {
+    setQuickSearchInput(cityName);
+    setLocation(cityName);
+    onSearch({ location: cityName, moveIn, budget, type: propertyType });
   };
 
   return (
-    <section className="relative overflow-hidden pt-10 pb-16 md:pt-16 md:pb-24 border-b border-border/70">
+    <section className="relative overflow-hidden pt-8 pb-14 md:pt-14 md:pb-20 border-b border-border/70">
       {/* Subtle architectural grid pattern background */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.035]"
@@ -52,27 +70,84 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       {/* Subtle organic ambient gradient blur */}
       <div className="absolute top-12 left-1/2 -translate-x-1/2 w-[720px] h-[360px] bg-secondary/10 rounded-full blur-3xl pointer-events-none -z-10" />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-6">
         
-        {/* Category Pill Tag */}
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-surface border border-border shadow-subtle mb-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          <span className="text-xs font-semibold text-text-primary tracking-wide">
-            Next-Gen Rental & Shared Living Intelligence
-          </span>
-          <span className="text-text-muted text-xs">·</span>
-          <span className="text-xs font-semibold text-primary">Ahmedabad & GIFT Corridor</span>
-        </div>
+        {/* Section 9: Personal Greeting when logged in */}
+        {user.fullName && (
+          <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-surface border border-border shadow-subtle animate-in fade-in duration-300">
+            <span className="text-xs font-black text-text-primary">
+              Good morning, {user.fullName.split(' ')[0]} 👋
+            </span>
+            <span className="text-text-muted text-xs">·</span>
+            <span className="text-xs font-bold text-primary">
+              {userRole === 'tenant' ? 'Tenant Explorer' : 'Property Owner View'}
+            </span>
+          </div>
+        )}
+
+        {/* If tenant has an active home, show Section 9 My Home status bar */}
+        {userRole === 'tenant' && (
+          <div className="max-w-3xl mx-auto bg-surface/90 backdrop-blur-md p-3.5 rounded-2xl border border-primary/20 shadow-subtle flex flex-wrap items-center justify-between gap-3 text-xs text-left">
+            <div className="flex items-center space-x-2.5">
+              <div className="w-8 h-8 rounded-xl bg-primary-light text-primary flex items-center justify-center font-bold">
+                <Home className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="font-extrabold text-text-primary block">My Home: The Solitaire Terraces (Flat 402)</span>
+                <span className="text-[11px] text-text-muted">Vastrapur, Ahmedabad</span>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div>
+                <span className="text-[10px] text-text-muted block">Rent Status</span>
+                <span className={`font-black ${rentPaid ? 'text-emerald-700' : 'text-amber-700'}`}>
+                  {rentPaid ? '✓ Paid' : '₹24,000 (Due in 5d)'}
+                </span>
+              </div>
+              <div>
+                <span className="text-[10px] text-text-muted block">Maintenance</span>
+                <span className="font-black text-primary">
+                  {maintenanceTickets.filter(t => t.status !== 'Resolved').length > 0 ? '1 In Progress' : 'All Clear'}
+                </span>
+              </div>
+              {onOpenMyHome && (
+                <button
+                  type="button"
+                  onClick={onOpenMyHome}
+                  className="text-[11px] font-bold text-primary hover:underline"
+                >
+                  Dashboard →
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Large Editorial Headline */}
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-text-primary tracking-tight leading-[1.12] max-w-4xl mx-auto mb-6 text-balance">
-          Your next home should <span className="text-primary underline decoration-secondary/60 decoration-wavy decoration-2 underline-offset-8">fit your life</span>.
+        <h1 className="text-3xl sm:text-5xl font-black text-text-primary tracking-tight leading-[1.12] max-w-4xl mx-auto text-balance">
+          Where do you want to <span className="text-primary underline decoration-secondary/60 decoration-wavy decoration-2 underline-offset-8">live</span>?
         </h1>
 
         {/* Supporting Editorial Copy */}
-        <p className="text-base sm:text-lg lg:text-xl text-text-secondary max-w-2xl mx-auto mb-10 leading-relaxed font-normal text-balance">
-          Discover verified spaces, understand the real cost, find compatible roommates, and manage everything from one transparent place.
+        <p className="text-xs sm:text-base text-text-secondary max-w-2xl mx-auto font-normal text-balance">
+          Discover verified spaces, understand the real cost, find compatible roommates, and manage your home from one transparent place.
         </p>
+
+        {/* Quick Search City / Landmark Pills (Section 9) */}
+        <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+          <span className="text-[11px] font-bold text-text-muted uppercase tracking-wider mr-1">Popular:</span>
+          {['Ahmedabad', 'Vastrapur', 'Navrangpura', 'Gandhinagar', 'GIFT City', 'Vadodara'].map((cityPill) => (
+            <button
+              key={cityPill}
+              type="button"
+              onClick={() => handleQuickPillClick(cityPill)}
+              className="px-3 py-1 rounded-full text-xs font-semibold bg-surface border border-border hover:border-primary hover:text-primary transition-all shadow-subtle"
+            >
+              {cityPill}
+            </button>
+          ))}
+        </div>
 
         {/* Interactive Search Console */}
         <div className="max-w-4xl mx-auto bg-surface rounded-2xl shadow-elevated border border-border p-3 sm:p-4 text-left transition-all hover:border-primary/30">

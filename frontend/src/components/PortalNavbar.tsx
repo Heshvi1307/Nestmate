@@ -31,6 +31,8 @@ interface NavbarProps {
   onOpenAIAssistant: () => void;
   notifications: NotificationItem[];
   onMarkNotificationRead: (id: string) => void;
+  onOpenLandingPage?: () => void;
+  onOpenOnboarding?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -43,7 +45,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenCompare,
   onOpenAIAssistant,
   notifications,
-  onMarkNotificationRead
+  onMarkNotificationRead,
+  onOpenLandingPage,
+  onOpenOnboarding
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
@@ -74,7 +78,10 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Brand Logo */}
         <div className="flex items-center space-x-6">
           <button 
-            onClick={() => setCurrentTab('explore')}
+            onClick={() => {
+              if (onOpenLandingPage) onOpenLandingPage();
+              else setCurrentTab('explore');
+            }}
             className="flex items-center space-x-2.5 group text-left focus:outline-none"
           >
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-surface shadow-subtle group-hover:bg-primary-hover transition-colors">
@@ -129,8 +136,18 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Right Side Actions */}
-        <div className="flex items-center space-x-2.5 sm:space-x-3">
-          
+        <div className="flex items-center space-x-2 sm:space-x-2.5">
+          {onOpenLandingPage && (
+            <button
+              onClick={onOpenLandingPage}
+              className="hidden sm:inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-surface border border-border text-text-primary hover:border-primary/50 transition-all shadow-subtle"
+              title="View Pitch Overview"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-secondary" />
+              <span>Pitch Overview</span>
+            </button>
+          )}
+
           {/* Compare Button */}
           <button
             onClick={onOpenCompare}

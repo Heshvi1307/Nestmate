@@ -201,21 +201,25 @@ export const SnapFixTriage: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
-        <div className="absolute right-0 top-0 translate-x-10 -translate-y-10 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="max-w-3xl space-y-3 relative z-10">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 bg-teal-500/20 border border-teal-400/30 rounded-full text-xs font-semibold text-teal-300">
-            <ShieldCheck className="w-4 h-4 text-teal-300" />
-            <span>Pillar 3: Anti-Fraud Visual Condition Triage</span>
+      {/* Informational Hero Banner */}
+      <div className="bg-surface rounded-2xl border border-border p-6 shadow-subtle flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="space-y-1.5 max-w-3xl">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-light border border-primary/20 text-primary text-xs font-bold">
+            <ShieldCheck className="w-3.5 h-3.5 text-secondary" />
+            <span>Anti-Fraud Visual Verification Engine</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            SnapFix Move-In Proof & Damage Triage
-          </h2>
-          <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-            Eliminates photo-spoofing and deposit deductions with <strong>live camera liveness verification</strong>,
-            hardware EXIF telemetry, cryptographic SHA-256 sealing, and statutory Model Tenancy Act repair liability routing.
+          <h3 className="text-xl sm:text-2xl font-black text-text-primary tracking-tight">
+            Cryptographic Move-In Proof & Statutory Liability Routing
+          </h3>
+          <p className="text-xs text-text-secondary leading-relaxed">
+            Eliminates photo-spoofing and unlawful deposit withholdings using <strong>hardware EXIF telemetry</strong>, live liveness challenges, SHA-256 digital sealing, and automated Model Tenancy Act (MTA 2021) contractor triage.
           </p>
+        </div>
+        <div className="flex items-center gap-2 self-start md:self-auto shrink-0">
+          <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+            Sec. 65B Admissible
+          </span>
         </div>
       </div>
 

@@ -11,12 +11,12 @@ import {
   ChevronRight, 
   X, 
   Camera, 
-  ShieldCheck,
-  Check,
-  Calendar
+  ShieldCheck, 
+  Check, 
+  Calendar 
 } from 'lucide-react';
 import { MaintenanceTicket } from '../types';
-import { MOCK_MAINTENANCE_TICKETS } from '../data/mockData';
+import { useNestMate } from '../context/NestMateContext';
 
 interface MaintenanceHubProps {
   onOpenMessageWithTechnician: () => void;
@@ -25,8 +25,12 @@ interface MaintenanceHubProps {
 export const MaintenanceHub: React.FC<MaintenanceHubProps> = ({
   onOpenMessageWithTechnician
 }) => {
-  const [tickets, setTickets] = useState<MaintenanceTicket[]>(MOCK_MAINTENANCE_TICKETS);
-  const [activeTicketId, setActiveTicketId] = useState<string>(MOCK_MAINTENANCE_TICKETS[0].id);
+  const { 
+    maintenanceTickets: tickets, 
+    createMaintenanceTicket, 
+    selectedTicketId, 
+    setSelectedTicketId 
+  } = useNestMate();
   const [modalOpen, setModalOpen] = useState(false);
 
   // New ticket state
@@ -37,42 +41,35 @@ export const MaintenanceHub: React.FC<MaintenanceHubProps> = ({
   const [priority, setPriority] = useState<MaintenanceTicket['priority']>('Medium');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-  const selectedTicket = tickets.find(t => t.id === activeTicketId) || tickets[0];
+  const selectedTicket = tickets.find(t => t.id === selectedTicketId) || tickets[0] || {
+    id: 't-default',
+    ticketNumber: 'MNT-402',
+    title: 'Kitchen Sink Leak',
+    category: 'Plumbing',
+    unit: 'Flat 402, Green Residency',
+    locationInHouse: 'Kitchen Sink Under-Pipe',
+    description: 'Pipe joint seal has micro-fissure causing water seepage into modular cabinet.',
+    priority: 'High',
+    status: 'Reported',
+    reportedAt: '09:12 AM',
+    activityTimeline: []
+  };
 
   const handleCreateTicket = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !description.trim()) return;
 
-    const newTicket: MaintenanceTicket = {
-      id: `ticket-${Date.now()}`,
-      ticketNumber: `MNT-${Math.floor(400 + Math.random() * 50)}`,
+    const created = createMaintenanceTicket({
       title,
       category,
-      unit: 'Flat 402, Green Residency',
-      locationInHouse: locationInHouse || 'Main Living Quarters',
+      unit: 'Flat 402, The Solitaire Terraces, Vastrapur',
+      locationInHouse: locationInHouse || 'Kitchen / Main Living Quarters',
       description,
       priority,
-      status: 'Reported',
-      reportedAt: 'Just now',
-      photoUrl: photoPreview || 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80',
-      technician: {
-        name: 'Rahul Sharma',
-        company: 'Rahul Sanitary & Home Services (Certified Partner)',
-        rating: 4.9,
-        phone: '+91 98250 44192',
-        scheduledTime: 'Today · Auto-Dispatching',
-        eta: 'Assigning nearest technician',
-        avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80'
-      },
-      activityTimeline: [
-        { time: 'Just now', title: 'Issue Reported', description: 'Submitted via mobile tenant portal with description.', actor: 'Het (Tenant)', status: 'done' },
-        { time: 'In 5m', title: 'Property Manager Routing', description: 'Queued for immediate contractor SLA dispatch.', actor: 'NESTORA AI Dispatch', status: 'active' },
-        { time: 'Upcoming', title: 'Technician Assignment', description: 'Licensed technician will be confirmed with GPS tracking.', actor: 'Field Dispatch', status: 'pending' }
-      ]
-    };
+      photoUrl: photoPreview || 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80'
+    });
 
-    setTickets([newTicket, ...tickets]);
-    setActiveTicketId(newTicket.id);
+    setSelectedTicketId(created.id);
     setModalOpen(false);
 
     // Reset
@@ -82,13 +79,14 @@ export const MaintenanceHub: React.FC<MaintenanceHubProps> = ({
     setPhotoPreview(null);
   };
 
-  const getStatusStepIndex = (status: MaintenanceTicket['status']) => {
+  const getStatusStepIndex = (status: MaintenanceTicket['status']): number => {
     switch (status) {
       case 'Reported': return 0;
       case 'Assigned': return 1;
       case 'Technician Scheduled': return 2;
       case 'In Progress': return 3;
       case 'Resolved': return 4;
+      default: return 0;
     }
   };
 
@@ -142,13 +140,13 @@ export const MaintenanceHub: React.FC<MaintenanceHubProps> = ({
 
           <div className="space-y-2.5">
             {tickets.map((t) => {
-              const isSelected = t.id === activeTicketId;
+              const isSelected = t.id === selectedTicketId;
               const isResolved = t.status === 'Resolved';
 
               return (
                 <div
                   key={t.id}
-                  onClick={() => setActiveTicketId(t.id)}
+                  onClick={() => setSelectedTicketId(t.id)}
                   className={`p-4 rounded-xl border transition-all cursor-pointer ${
                     isSelected
                       ? 'bg-surface border-primary ring-2 ring-primary/20 shadow-card'

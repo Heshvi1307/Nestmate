@@ -32,7 +32,7 @@ export const TrustCenter: React.FC = () => {
       title: '2. 48-Point Physical Property Audit',
       status: 'Verified',
       badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-      description: 'Every NESTORA home undergoes an on-site physical inspection before receiving the verified badge.',
+      description: 'Every NestMate home undergoes an on-site physical inspection before receiving the verified badge.',
       points: [
         'Electrical load & earth leakage circuit breaker tests',
         'Plumbing pipe pressure test and drain flow inspection',
@@ -96,10 +96,10 @@ export const TrustCenter: React.FC = () => {
           <span>Radical Housing Transparency</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-text-primary tracking-tight">
-          NESTORA Trust Center
+          NestMate Trust Center
         </h1>
         <p className="text-sm text-text-secondary mt-1.5 leading-relaxed">
-          The traditional rental market relies on blind trust and verbal promises. NESTORA replaces ambiguity with verified data, enforceable timelines, and objective criteria.
+          The traditional rental market relies on blind trust and verbal promises. NestMate replaces ambiguity with verified data, enforceable timelines, and objective criteria.
         </p>
       </div>
 

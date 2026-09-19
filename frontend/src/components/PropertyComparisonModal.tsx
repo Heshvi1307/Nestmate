@@ -79,7 +79,7 @@ export const PropertyComparisonModal: React.FC<PropertyComparisonModalProps> = (
               </span>
             </div>
             <p className="text-xs text-text-secondary leading-relaxed">
-              NESTORA does not declare a generic "winner". Every home balances different priorities:
+              NestMate does not declare a generic "winner". Every home balances different priorities:
             </p>
             <ul className="mt-2 space-y-1.5 text-xs text-text-primary font-medium">
               <li className="flex items-start space-x-2">
